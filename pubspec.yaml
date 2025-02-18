@@ -1,0 +1,20 @@
+name: dart_express
+description: A starting point for Dart libraries or applications.
+version: 1.0.0
+# repository: https://github.com/my_org/my_repo
+
+environment:
+  sdk: ^3.6.0
+
+# Add regular dependencies here.
+dependencies:
+  args: ^2.4.2
+  http: ^1.2.2
+  meta: ^1.16.0
+  mime: ^2.0.0
+  uri: ^1.0.0
+  xml: ^6.5.0
+
+dev_dependencies:
+  lints: ^5.0.0
+  test: ^1.24.0

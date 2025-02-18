@@ -8,6 +8,7 @@ import '../models/request.dart';
 import '../models/response.dart';
 import 'controller.dart';
 import 'dependency_injection.dart';
+import 'error_handler.dart';
 
 class RequestTypes {
   static const String GET = 'GET';
@@ -24,6 +25,11 @@ class DartExpress {
   final Router _router = Router();
   final List<MiddlewareHandler> _globalMiddleware = [];
   final DIContainer _container = DIContainer();
+  ErrorHandler? _errorHandler;
+
+  void setErrorHandler(ErrorHandler handler) {
+    _errorHandler = handler;
+  }
 
   void useController(String prefix, Controller controller) {
     controller.initialize(this, prefix: prefix);
@@ -113,13 +119,34 @@ class DartExpress {
       if (handler != null) {
         await handler(request, response);
       } else {
-        response.setStatus(HttpStatus.notFound);
-        response.text('Not Found');
+        throw NotFoundError('Route not found: ${request.uri.path}');
       }
-    } catch (e, trace) {
-      print('Error handling request: $e, trace:$trace');
-      response.setStatus(HttpStatus.internalServerError);
-      response.text('Internal Server Error');
+    } catch (error, stackTrace) {
+      if (_errorHandler != null) {
+        try {
+          await _errorHandler!(error, request, response);
+        } catch (e) {
+          print('Error in error handler: $e');
+          response.setStatus(HttpStatus.internalServerError);
+          response.json({
+            'error': 'Internal Server Error',
+            'message': 'Error handling the original error'
+          });
+        }
+      } else {
+        print('Unhandled error: $error\nStackTrace: $stackTrace');
+        if (error is HttpError) {
+          response.setStatus(error.statusCode);
+          response.json({
+            'error': error.message,
+            'data': error.data,
+          });
+        } else {
+          response.setStatus(HttpStatus.internalServerError);
+          response.json(
+              {'error': 'Internal Server Error', 'message': error.toString()});
+        }
+      }
     }
 
     if (!response.isSent) {

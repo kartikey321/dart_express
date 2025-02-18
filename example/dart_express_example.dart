@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dart_express/dart_express.dart';
+import 'package:dart_express/src/services/error_handler.dart';
 
 void main() {
   final app = DartExpress();
@@ -26,6 +27,26 @@ void main() {
       window: Duration(minutes: 5),
     ),
   );
+
+  // Set up global error handler
+  app.setErrorHandler((error, req, res) async {
+    if (error is ValidationError) {
+      res.json({
+        'error': 'Validation Error',
+        'message': error.message,
+        'details': error.data
+      }, statusCode: error.statusCode);
+    } else if (error is UnauthorizedError) {
+      res.setStatus(error.statusCode);
+      res.json({'error': 'Unauthorized', 'message': error.message},
+          statusCode: error.statusCode);
+    } else {
+      res.setStatus(HttpStatus.internalServerError);
+      res.json(
+          {'error': 'Internal Server Error', 'message': 'Something went wrong'},
+          statusCode: error.statusCode);
+    }
+  });
 
   // Add a route with path parameter
   app.get('/api/data', (request, response) async {

@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-
 class Response {
   int statusCode;
   dynamic body;
@@ -19,35 +18,42 @@ class Response {
     }
   }
 
-  void json(Map<String, dynamic> data) {
+  void json(Map<String, dynamic> data, {int statusCode = HttpStatus.ok}) {
     body = jsonEncode(data);
     headers['Content-Type'] = ContentType.json.mimeType;
+    setStatus(statusCode);
   }
 
-  void text(String data) {
+  void text(String data, {int statusCode = HttpStatus.ok}) {
     body = data;
     headers['Content-Type'] = ContentType.text.mimeType;
+    setStatus(statusCode);
   }
 
-  void html(String html) {
+  void html(String html, {int statusCode = HttpStatus.ok}) {
     body = html;
     headers['Content-Type'] = ContentType.html.mimeType;
   }
 
-  void xml(String xml) {
+  void xml(String xml, {int statusCode = HttpStatus.ok}) {
     body = xml;
     headers['Content-Type'] = 'application/xml';
+    setStatus(statusCode);
   }
 
   void bytes(Uint8List bytes,
-      {String contentType = 'application/octet-stream'}) {
+      {String contentType = 'application/octet-stream',
+      int statusCode = HttpStatus.ok}) {
     body = bytes;
     isBinary = true;
     headers['Content-Type'] = contentType;
     headers['Content-Length'] = bytes.length.toString();
+    setStatus(statusCode);
   }
 
-  Future<void> file(File file) async {
+  Future<void> file(
+    File file,
+  ) async {
     if (await file.exists()) {
       final bytes = await file.readAsBytes();
       this.bytes(bytes, contentType: _getContentType(file.path));

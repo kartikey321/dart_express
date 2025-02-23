@@ -18,37 +18,44 @@ class Response {
     }
   }
 
-  void json(Map<String, dynamic> data, {int statusCode = HttpStatus.ok}) {
+  void json(Map<String, dynamic> data, {int? statusCode}) {
     body = jsonEncode(data);
     headers['Content-Type'] = ContentType.json.mimeType;
-    setStatus(statusCode);
+    if (statusCode != null) {
+      setStatus(statusCode);
+    }
   }
 
-  void text(String data, {int statusCode = HttpStatus.ok}) {
+  void text(String data, {int? statusCode}) {
     body = data;
     headers['Content-Type'] = ContentType.text.mimeType;
-    setStatus(statusCode);
+    if (statusCode != null) {
+      setStatus(statusCode);
+    }
   }
 
-  void html(String html, {int statusCode = HttpStatus.ok}) {
+  void html(String html, {int? statusCode}) {
     body = html;
     headers['Content-Type'] = ContentType.html.mimeType;
   }
 
-  void xml(String xml, {int statusCode = HttpStatus.ok}) {
+  void xml(String xml, {int? statusCode}) {
     body = xml;
     headers['Content-Type'] = 'application/xml';
-    setStatus(statusCode);
+    if (statusCode != null) {
+      setStatus(statusCode);
+    }
   }
 
   void bytes(Uint8List bytes,
-      {String contentType = 'application/octet-stream',
-      int statusCode = HttpStatus.ok}) {
+      {String contentType = 'application/octet-stream', int? statusCode}) {
     body = bytes;
     isBinary = true;
     headers['Content-Type'] = contentType;
     headers['Content-Length'] = bytes.length.toString();
-    setStatus(statusCode);
+    if (statusCode != null) {
+      setStatus(statusCode);
+    }
   }
 
   Future<void> file(

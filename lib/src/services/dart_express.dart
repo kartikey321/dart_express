@@ -25,6 +25,7 @@ class DartExpress {
   final Router _router = Router();
   final List<MiddlewareHandler> _globalMiddleware = [];
   final DIContainer _container = DIContainer();
+  DIContainer get container => _container;
   ErrorHandler? _errorHandler;
 
   void setErrorHandler(ErrorHandler handler) {
@@ -137,10 +138,12 @@ class DartExpress {
         print('Unhandled error: $error\nStackTrace: $stackTrace');
         if (error is HttpError) {
           response.setStatus(error.statusCode);
-          response.json({
-            'error': error.message,
-            'data': error.data,
-          });
+          response.json(
+            {
+              'error': error.message,
+              'data': error.data,
+            },
+          );
         } else {
           response.setStatus(HttpStatus.internalServerError);
           response.json(

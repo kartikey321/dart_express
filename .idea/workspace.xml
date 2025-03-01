@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="55cb76d9-91ea-4e8a-a2a1-7195ff1b3683" name="Changes" comment="testing static file serving">
+      <change afterPath="$PROJECT_DIR$/apps/dart_express_examples/mongo_example/lib/models/user.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/dart_express_examples/mongo_example/lib/services/auth_service.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/dart_express_examples/mongo_example/public/Kartikey-Mahawar.pdf" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/apps/dart_express_examples/mongo_example/public/download.jpeg" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_SDK.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/material_theme_project_new.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/CHANGELOG.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/analysis_options.yaml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/dart_express_examples/mongo_example/bin/mongo_example.dart" beforeDir="false" afterPath="$PROJECT_DIR$/apps/dart_express_examples/mongo_example/bin/mongo_example.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/dart_express_examples/mongo_example/pubspec.lock" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/dart_express_examples/mongo_example/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/apps/dart_express_examples/mongo_example/pubspec.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/dart_express.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/dart_express_example.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/dart_express.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/src/dart_express_base.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/src/extensions.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/src/models/memory_store.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/src/models/middleware.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/src/models/models.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/src/models/request.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/src/models/response.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/src/models/route.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/src/services/controller.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/src/services/dart_express.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/src/services/dependency_injection.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/src/services/error_handler.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/src/services/router.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/src/services/services.dart" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test/dart_express_test.dart" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Dart File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/apps/dart_express_examples" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;kartikey321&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/kartikey321/dart_express.git&quot;,
+    &quot;accountId&quot;: &quot;a679076a-ed1e-490d-b5f7-696174020e1d&quot;
+  }
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 0
+}</component>
+  <component name="ProjectId" id="2tDxrkeEvKFxduYXze40sLKgDAD" />
+  <component name="ProjectViewState">
+    <option name="autoscrollFromSource" value="true" />
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Dart Test.Application in dart_express_test.dart.executor&quot;: &quot;Run&quot;,
+    &quot;Dart Test.GET / returns 200 with correct body in dart_express_test.dart.executor&quot;: &quot;Run&quot;,
+    &quot;Dart Test.Middleware can modify response in dart_express_test.dart.executor&quot;: &quot;Run&quot;,
+    &quot;Dart Test.POST / returns 201 with JSON response in dart_express_test.dart.executor&quot;: &quot;Debug&quot;,
+    &quot;Dart Test.Parses route parameters in dart_express_test.dart.executor&quot;: &quot;Run&quot;,
+    &quot;Dart Test.Runs middleware in order in dart_express_test.dart.executor&quot;: &quot;Run&quot;,
+    &quot;Dart Test.Tests in dart_express_test.dart.executor&quot;: &quot;Run&quot;,
+    &quot;Dart Test.Unhandled error returns 500 in dart_express_test.dart.executor&quot;: &quot;Run&quot;,
+    &quot;Dart Test.Unknown route returns 404 in dart_express_test.dart.executor&quot;: &quot;Debug&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/karti/Downloads/flutter_projects/dart_express&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\karti\Downloads\flutter_projects\dart_express\lib\src" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Dart Test.Parses route parameters in dart_express_test.dart">
+    <configuration name="Middleware can modify response in dart_express_test.dart" type="DartTestRunConfigurationType" factoryName="Dart Test" temporary="true" nameIsGenerated="true">
+      <option name="filePath" value="$PROJECT_DIR$/test/dart_express_test.dart" />
+      <option name="scope" value="GROUP_OR_TEST_BY_NAME" />
+      <option name="testName" value="Middleware can modify response" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Parses route parameters in dart_express_test.dart" type="DartTestRunConfigurationType" factoryName="Dart Test" temporary="true" nameIsGenerated="true">
+      <option name="filePath" value="$PROJECT_DIR$/test/dart_express_test.dart" />
+      <option name="scope" value="GROUP_OR_TEST_BY_NAME" />
+      <option name="testName" value="Parses route parameters" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Runs middleware in order in dart_express_test.dart" type="DartTestRunConfigurationType" factoryName="Dart Test" temporary="true" nameIsGenerated="true">
+      <option name="filePath" value="$PROJECT_DIR$/test/dart_express_test.dart" />
+      <option name="scope" value="GROUP_OR_TEST_BY_NAME" />
+      <option name="testName" value="Runs middleware in order" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Tests in dart_express" type="DartTestRunConfigurationType" factoryName="Dart Test">
+      <option name="filePath" value="$PROJECT_DIR$" />
+      <option name="scope" value="FOLDER" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Unhandled error returns 500 in dart_express_test.dart" type="DartTestRunConfigurationType" factoryName="Dart Test" temporary="true" nameIsGenerated="true">
+      <option name="filePath" value="$PROJECT_DIR$/test/dart_express_test.dart" />
+      <option name="scope" value="GROUP_OR_TEST_BY_NAME" />
+      <option name="testName" value="Unhandled error returns 500" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Unknown route returns 404 in dart_express_test.dart" type="DartTestRunConfigurationType" factoryName="Dart Test" temporary="true" nameIsGenerated="true">
+      <option name="filePath" value="$PROJECT_DIR$/test/dart_express_test.dart" />
+      <option name="scope" value="GROUP_OR_TEST_BY_NAME" />
+      <option name="testName" value="Unknown route returns 404" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Dart Test.Parses route parameters in dart_express_test.dart" />
+        <item itemvalue="Dart Test.Unhandled error returns 500 in dart_express_test.dart" />
+        <item itemvalue="Dart Test.Middleware can modify response in dart_express_test.dart" />
+        <item itemvalue="Dart Test.Runs middleware in order in dart_express_test.dart" />
+        <item itemvalue="Dart Test.Unknown route returns 404 in dart_express_test.dart" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-28b599e66164-intellij.indexing.shared.core-IU-242.22855.74" />
+        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-IU-242.22855.74" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="55cb76d9-91ea-4e8a-a2a1-7195ff1b3683" name="Changes" comment="" />
+      <created>1739900649818</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1739900649818</updated>
+      <workItem from="1739900650879" duration="9874000" />
+      <workItem from="1740215881817" duration="5979000" />
+      <workItem from="1740227366970" duration="12127000" />
+      <workItem from="1740505921629" duration="602000" />
+      <workItem from="1740513346157" duration="1751000" />
+      <workItem from="1740857019875" duration="4352000" />
+      <workItem from="1740865250005" duration="976000" />
+      <workItem from="1740866242369" duration="147000" />
+    </task>
+    <task id="LOCAL-00001" summary="changed path checking from splitting into path segments to treating it as a whole using regex">
+      <option name="closed" value="true" />
+      <created>1739910095183</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1739910095183</updated>
+    </task>
+    <task id="LOCAL-00002" summary="added global error handler">
+      <option name="closed" value="true" />
+      <created>1739911061254</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1739911061254</updated>
+    </task>
+    <task id="LOCAL-00003" summary="added tests fixed bugs in response.dart and expose container getter in dart_express.dart">
+      <option name="closed" value="true" />
+      <created>1740343114071</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1740343114071</updated>
+    </task>
+    <task id="LOCAL-00004" summary="testing static file serving">
+      <option name="closed" value="true" />
+      <created>1740862264368</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1740862264368</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="changed path checking from splitting into path segments to treating it as a whole using regex" />
+    <MESSAGE value="added global error handler" />
+    <MESSAGE value="added tests fixed bugs in response.dart and expose container getter in dart_express.dart" />
+    <MESSAGE value="testing static file serving" />
+    <option name="LAST_COMMIT_MESSAGE" value="testing static file serving" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="Dart">
+          <url>file://$PROJECT_DIR$/test/dart_express_test.dart</url>
+          <line>41</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>

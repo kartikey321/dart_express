@@ -1,0 +1,5 @@
+name: dart_express_project
+
+packages:
+  - apps/**
+  - packages/**

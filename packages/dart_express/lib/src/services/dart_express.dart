@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:dart_express/src/services/router.dart';
-import 'package:path/path.dart' as path;
 
 import '../models/memory_store.dart';
 import '../models/middleware.dart';
@@ -110,86 +109,6 @@ class DartExpress {
     await for (HttpRequest httpRequest in server) {
       await _handleRequest(httpRequest);
     }
-  }
-
-  void static(
-    String mountPath,
-    String directory, {
-    bool serveIndex = true,
-    bool redirectToIndex = true,
-  }) {
-    use(_createStaticMiddleware(
-      mountPath,
-      directory,
-      serveIndex: serveIndex,
-      redirectToIndex: redirectToIndex,
-    ));
-  }
-
-  MiddlewareHandler _createStaticMiddleware(
-    String mountPath,
-    String directory, {
-    bool serveIndex = true,
-    bool redirectToIndex = true,
-  }) {
-    return (Request req, Response res, NextFunction next) async {
-      // Skip non-GET/HEAD requests
-      if (req.method != 'GET' && req.method != 'HEAD') return next();
-
-      String requestPath = req.uri.path;
-
-      // Check if request path starts with mount path
-      if (!requestPath.startsWith(mountPath)) return next();
-
-      // Extract relative path
-      String relativePath = requestPath.substring(mountPath.length);
-      relativePath = relativePath.startsWith('/')
-          ? relativePath.substring(1)
-          : relativePath;
-
-      // Resolve full file path
-      String fullPath = path.join(directory, relativePath);
-      fullPath = path.normalize(fullPath);
-
-      // Security check
-      if (!path.isWithin(directory, fullPath)) return next();
-
-      File file = File(fullPath);
-      FileSystemEntityType type;
-
-      try {
-        type = await file.exists()
-            ? (await file.stat()).type
-            : FileSystemEntityType.notFound;
-      } catch (_) {
-        return next();
-      }
-
-      // Handle directories
-      if (type == FileSystemEntityType.directory) {
-        if (redirectToIndex && !requestPath.endsWith('/')) {
-          res.redirect('${req.uri.path}/');
-          return;
-        }
-
-        if (serveIndex) {
-          File indexFile = File(path.join(fullPath, 'index.html'));
-          if (await indexFile.exists()) {
-            await res.file(indexFile);
-            return;
-          }
-        }
-        return next();
-      }
-
-      // Serve file if exists
-      if (type == FileSystemEntityType.file) {
-        await res.file(file);
-        return;
-      }
-
-      next();
-    };
   }
 
   Future<void> _handleRequest(HttpRequest httpRequest) async {

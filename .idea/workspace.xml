@@ -4,7 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="55cb76d9-91ea-4e8a-a2a1-7195ff1b3683" name="Changes" comment="changed file to melos type" />
+    <list default="true" id="55cb76d9-91ea-4e8a-a2a1-7195ff1b3683" name="Changes" comment="changed file to melos type">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/apps/dart_express_examples/mongo_example/lib/services/auth_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/apps/dart_express_examples/mongo_example/lib/services/auth_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/melos_dart_express_project.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/dart_express/dart_express.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/dart_express/melos_dart_express.iml" beforeDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -18,7 +24,7 @@
     </option>
   </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/apps/dart_express_examples" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="ROOT_SYNC" value="DONT_SYNC" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
@@ -37,6 +43,7 @@
   &quot;associatedIndex&quot;: 0
 }</component>
   <component name="ProjectId" id="2tDxrkeEvKFxduYXze40sLKgDAD" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectViewState">
     <option name="autoscrollFromSource" value="true" />
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -55,7 +62,7 @@
     "Dart Test.Unknown route returns 404 in dart_express_test.dart.executor": "Debug",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "<unknown>",
+    "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/karti/Downloads/flutter_projects/dart_express",
     "node.js.detected.package.eslint": "true",
@@ -63,6 +70,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
     "show.migrate.to.gradle.popup": "false",
     "vue.rearranger.settings.migration": "true"
   }
@@ -142,6 +150,8 @@
       <workItem from="1740857019875" duration="4352000" />
       <workItem from="1740865250005" duration="976000" />
       <workItem from="1740866242369" duration="418000" />
+      <workItem from="1740866674785" duration="225000" />
+      <workItem from="1740866911741" duration="681000" />
     </task>
     <task id="LOCAL-00001" summary="changed path checking from splitting into path segments to treating it as a whole using regex">
       <option name="closed" value="true" />
@@ -190,6 +200,9 @@
     <option name="version" value="3" />
   </component>
   <component name="VcsManagerConfiguration">
+    <ignored-roots>
+      <path value="$PROJECT_DIR$/apps/dart_express_examples" />
+    </ignored-roots>
     <MESSAGE value="changed path checking from splitting into path segments to treating it as a whole using regex" />
     <MESSAGE value="added global error handler" />
     <MESSAGE value="added tests fixed bugs in response.dart and expose container getter in dart_express.dart" />

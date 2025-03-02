@@ -122,6 +122,12 @@
       "languageVersion": "2.12"
     },
     {
+      "name": "mime",
+      "rootUri": "file:///C:/Users/karti/AppData/Local/Pub/Cache/hosted/pub.dev/mime-2.0.0",
+      "packageUri": "lib/",
+      "languageVersion": "3.2"
+    },
+    {
       "name": "mustache_template",
       "rootUri": "file:///C:/Users/karti/AppData/Local/Pub/Cache/hosted/pub.dev/mustache_template-2.0.0",
       "packageUri": "lib/",
@@ -230,7 +236,7 @@
       "languageVersion": "3.6"
     }
   ],
-  "generated": "2025-03-01T21:59:09.400244Z",
+  "generated": "2025-03-02T11:06:50.854399Z",
   "generator": "pub",
   "generatorVersion": "3.6.0",
   "flutterRoot": "file:///C:/Users/karti/Downloads/flutter/flutter",

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:dart_express/src/middleware/cookies_parser.dart';
 import 'package:dart_express/src/services/router.dart';
 
 import '../models/memory_store.dart';
@@ -22,6 +23,13 @@ class RequestTypes {
 }
 
 class DartExpress {
+  DartExpress({
+    bool useCookieParser = true,
+  }) {
+    if (useCookieParser) {
+      use(CookieParser.middleware());
+    }
+  }
   final Router _router = Router();
   final List<MiddlewareHandler> _globalMiddleware = [];
   final DIContainer _container = DIContainer();

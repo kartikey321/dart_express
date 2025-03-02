@@ -4,3 +4,5 @@ environment:
   sdk: ^3.6.0
 dev_dependencies:
   melos: ^6.3.2
+dependencies:
+  mime: ^2.0.0

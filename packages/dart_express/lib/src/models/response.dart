@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
+import 'dart:io' ;
 import 'dart:typed_data';
+import 'package:mime/mime.dart';
+
 
 class Response {
   int statusCode;
@@ -9,12 +11,53 @@ class Response {
   Map<String, String> headers = {};
   bool isBinary = false;
   bool _isSent = false;
-
+  final List<Cookie> _cookies = [];
   bool get isSent => _isSent;
 
   Response({this.statusCode = 200, this.body, Map<String, String>? headers}) {
     if (headers != null) {
       this.headers.addAll(headers);
+    }
+  }
+
+void cookie(
+    String name,
+    String value, {
+    DateTime? expires,
+    int? maxAge,
+    String? domain,
+    String? path,
+    bool secure = true,
+    bool httpOnly = true,
+    SameSite? sameSite = SameSite.lax,
+  }) {
+    final cookie = Cookie(name, value)
+      ..expires = expires
+      ..maxAge = maxAge
+      ..domain = domain
+      ..path = path ?? '/'
+      ..secure = secure
+      ..httpOnly = httpOnly;
+
+    if (sameSite != null) {
+      cookie.sameSite = sameSite;
+    }
+
+    _cookies.add(cookie);
+  }
+
+  void clearCookie(String name, {String? path, String? domain}) {
+    final cookie = Cookie(name, '')
+      ..maxAge = 0
+      ..expires = DateTime.utc(1970)
+      ..path = path
+      ..domain = domain;
+    _cookies.add(cookie);
+  }
+
+  void _setCookieHeaders() {
+    if (_cookies.isNotEmpty) {
+      headers[HttpHeaders.setCookieHeader] = _cookies.map((c) => c.toString()).join(', ');
     }
   }
 
@@ -75,38 +118,13 @@ class Response {
     headers['Location'] = url;
   }
 
-  static String _getContentType(String filePath) {
-    final extension = filePath.split('.').last.toLowerCase();
-    switch (extension) {
-      case 'html':
-        return ContentType.html.mimeType;
-      case 'css':
-        return 'text/css';
-      case 'js':
-        return 'application/javascript';
-      case 'json':
-        return ContentType.json.mimeType;
-      case 'png':
-        return 'image/png';
-      case 'jpg':
-      case 'jpeg':
-        return 'image/jpeg';
-      case 'gif':
-        return 'image/gif';
-      case 'svg':
-        return 'image/svg+xml';
-      case 'xml':
-        return 'application/xml';
-      case 'pdf':
-        return 'application/pdf';
-
-      default:
-        return ContentType.binary.toString();
-    }
-  }
+static String _getContentType(String filePath) {
+  return lookupMimeType(filePath) ?? 'application/octet-stream';
+}
 
   void send(HttpResponse httpResponse) {
     if (isSent) return;
+    _setCookieHeaders();
     _isSent = true;
 
     httpResponse.statusCode = statusCode;

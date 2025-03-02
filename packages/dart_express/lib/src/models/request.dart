@@ -1,11 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-
-import 'package:http/http.dart';
+import 'dart:typed_data';
+import 'package:dart_express/dart_express.dart';
 import 'package:mime/mime.dart';
 
-import '../services/dependency_injection.dart';
 
 class Request {
   final HttpRequest httpRequest;
@@ -16,6 +15,7 @@ class Request {
   Map<String, dynamic>? _body;
   Map<String, dynamic>? _formData;
   Map<String, List<MultipartFile>>? _files;
+   List<Cookie> cookies = [];
 
   Request(this.httpRequest, this.session, this.container) {
     query = httpRequest.uri.queryParameters;

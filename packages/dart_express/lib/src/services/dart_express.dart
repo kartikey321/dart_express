@@ -1,7 +1,8 @@
 import 'dart:io';
 
+import 'package:dart_express/dart_express.dart';
 import 'package:dart_express/src/middleware/cookies_parser.dart';
-import 'package:dart_express/src/services/router.dart';
+import 'package:dart_express/src/router/router_interface.dart';
 
 import '../models/memory_store.dart';
 import '../models/middleware.dart';
@@ -25,12 +26,13 @@ class RequestTypes {
 class DartExpress {
   DartExpress({
     bool useCookieParser = true,
-  }) {
+    RouterInterface? router, // Allow custom router injection
+  }) : _router = router ?? RadixRouter() {
     if (useCookieParser) {
       use(CookieParser.middleware());
     }
   }
-  final Router _router = Router();
+  final RouterInterface _router;
   final List<MiddlewareHandler> _globalMiddleware = [];
   final DIContainer _container = DIContainer();
   DIContainer get container => _container;
@@ -124,9 +126,10 @@ class DartExpress {
     final response = Response();
 
     try {
-      final handler = _router.findHandler(request.method, request.uri.path);
-      if (handler != null) {
-        await handler(request, response);
+      final routeMatch = _router.findRoute(request.method, request.uri.path);
+      request.params = routeMatch?.pathParams ?? {};
+      if (routeMatch != null) {
+        await routeMatch.handler(request, response);
       } else {
         throw NotFoundError('Route not found: ${request.uri.path}');
       }

@@ -60,7 +60,6 @@ void main() {
     late int port;
 
     setUp(() => app = DartExpress());
-
     // tearDown(() async => await server.close());
 
     test('Runs middleware in order', () async {
@@ -131,7 +130,7 @@ void main() {
   group('Route Parameters', () {
     late DartExpress app;
     late HttpServer server;
-    int port = 8081;
+    int port = 8082;
 
     setUp(() => app = DartExpress());
 
@@ -151,4 +150,7 @@ void main() {
       expect(response.body, 'User ID: 123');
     });
   });
+
+  //Write more tests here
+
 }

@@ -30,3 +30,7 @@ class UnauthorizedError extends HttpError {
   UnauthorizedError(String message, [dynamic data])
       : super(HttpStatus.unauthorized, message, data);
 }
+class RouteConflictError extends HttpError {
+  RouteConflictError(String message, [dynamic data])
+      : super(HttpStatus.conflict, message, data);
+}

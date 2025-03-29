@@ -11,13 +11,15 @@ abstract class RouterInterface {
   /// Find a matching route for incoming request
   /// Returns [RouteMatch] with handler and parameters if found
   RouteMatch? findRoute(String method, String path);
+
+  void addIsolatedRouter(String prefix, RouterInterface router);
 }
 
 /// Container for matched route results
 class RouteMatch {
   /// The request handler to execute
   final RequestHandler handler;
-  
+
   /// Path parameters extracted from the URL
   final Map<String, String> pathParams;
 

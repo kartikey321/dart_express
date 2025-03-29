@@ -5,7 +5,27 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="55cb76d9-91ea-4e8a-a2a1-7195ff1b3683" name="Changes" comment="changed file to melos type">
+      <change afterPath="$PROJECT_DIR$/packages/dart_express/example/example1.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/packages/dart_express/lib/src/services/base_container.dart" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/packages/dart_express/lib/src/services/isolated_container.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.dart_tool/package_config.json" beforeDir="false" afterPath="$PROJECT_DIR$/.dart_tool/package_config.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/melos.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/melos.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/melos_dart_express_project.iml" beforeDir="false" afterPath="$PROJECT_DIR$/melos_dart_express_project.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/dart_express/example/dart_express_example.dart" beforeDir="false" afterPath="$PROJECT_DIR$/packages/dart_express/example/dart_express_example.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/dart_express/lib/src/models/request.dart" beforeDir="false" afterPath="$PROJECT_DIR$/packages/dart_express/lib/src/models/request.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/dart_express/lib/src/router/listRouter/list_router.dart" beforeDir="false" afterPath="$PROJECT_DIR$/packages/dart_express/lib/src/router/listRouter/list_router.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/dart_express/lib/src/router/listRouter/route_entry.dart" beforeDir="false" afterPath="$PROJECT_DIR$/packages/dart_express/lib/src/router/listRouter/route_entry.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/dart_express/lib/src/router/radixRouter/radix_node.dart" beforeDir="false" afterPath="$PROJECT_DIR$/packages/dart_express/lib/src/router/radixRouter/radix_node.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/dart_express/lib/src/router/radixRouter/radix_router.dart" beforeDir="false" afterPath="$PROJECT_DIR$/packages/dart_express/lib/src/router/radixRouter/radix_router.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/dart_express/lib/src/router/router_interface.dart" beforeDir="false" afterPath="$PROJECT_DIR$/packages/dart_express/lib/src/router/router_interface.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/dart_express/lib/src/services/controller.dart" beforeDir="false" afterPath="$PROJECT_DIR$/packages/dart_express/lib/src/services/controller.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/dart_express/lib/src/services/dart_express.dart" beforeDir="false" afterPath="$PROJECT_DIR$/packages/dart_express/lib/src/services/dart_express.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/dart_express/lib/src/services/services.dart" beforeDir="false" afterPath="$PROJECT_DIR$/packages/dart_express/lib/src/services/services.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/packages/dart_express/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/packages/dart_express/pubspec.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,6 +55,9 @@
     &quot;accountId&quot;: &quot;a679076a-ed1e-490d-b5f7-696174020e1d&quot;
   }
 }</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="ProjectErrors" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 0
 }</component>
@@ -66,7 +89,7 @@
     &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.DirectoryMappings&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
     &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
@@ -149,6 +172,9 @@
       <workItem from="1740866674785" duration="225000" />
       <workItem from="1740866911741" duration="681000" />
       <workItem from="1740909375058" duration="299000" />
+      <workItem from="1742405950069" duration="59000" />
+      <workItem from="1743013730427" duration="3417000" />
+      <workItem from="1743281753614" duration="8611000" />
     </task>
     <task id="LOCAL-00001" summary="changed path checking from splitting into path segments to treating it as a whole using regex">
       <option name="closed" value="true" />

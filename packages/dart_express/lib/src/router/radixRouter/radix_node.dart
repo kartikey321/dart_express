@@ -17,7 +17,7 @@ class RadixNode {
 
   /// Registered handlers for different HTTP methods
   final Map<String, RequestHandler> handlers = {};
-
+  RouterInterface? isolatedRouter;
   RadixNode._({
     required this.segment,
     this.paramName,

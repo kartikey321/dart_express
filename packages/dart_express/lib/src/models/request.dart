@@ -2,20 +2,21 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
-import 'package:dart_express/dart_express.dart';
-import 'package:mime/mime.dart';
 
+import 'package:dart_express/dart_express.dart';
+import 'package:get_it/get_it.dart';
+import 'package:mime/mime.dart';
 
 class Request {
   final HttpRequest httpRequest;
   Map<String, String> params = {};
   late final Map<String, String> query;
   final Session session;
-  final DIContainer container;
+  final GetIt container;
   Map<String, dynamic>? _body;
   Map<String, dynamic>? _formData;
   Map<String, List<MultipartFile>>? _files;
-   List<Cookie> cookies = [];
+  List<Cookie> cookies = [];
 
   Request(this.httpRequest, this.session, this.container) {
     query = httpRequest.uri.queryParameters;
@@ -83,7 +84,7 @@ class Request {
 
   factory Request.from(
     HttpRequest httpRequest, {
-    required DIContainer container,
+    required GetIt container,
   }) {
     final sessionId = httpRequest.cookies
         .firstWhere(

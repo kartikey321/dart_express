@@ -145,7 +145,7 @@ class DatabaseService {
 
 class UsersController extends Controller {
   @override
-  void initialize(DartExpress app, {String prefix = ''}) {
+  void initialize(DartExpress app, {required String prefix}) {
     super.initialize(app, prefix: prefix);
     print("hi");
     // TODO: implement initialize

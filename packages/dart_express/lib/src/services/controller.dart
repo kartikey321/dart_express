@@ -1,7 +1,7 @@
 import 'package:meta/meta.dart';
 
-import 'dart_express.dart';
 import '../models/middleware.dart';
+import 'dart_express.dart';
 
 class ControllerOptions {
   late final DartExpress _app;
@@ -47,7 +47,7 @@ class ControllerOptions {
 abstract class Controller {
   late final ControllerOptions _options;
   @mustCallSuper
-  void initialize(DartExpress app, {String prefix = ''}) {
+  void initialize(DartExpress app, {required String prefix}) {
     _options = ControllerOptions(app, prefix);
     registerRoutes(_options);
   }

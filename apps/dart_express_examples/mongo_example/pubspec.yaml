@@ -10,6 +10,7 @@ environment:
 dependencies:
   bcrypt: ^1.1.3
   dart_express:
+    path: ../../../packages/dart_express
   dart_jsonwebtoken: ^2.17.0
 
   mongo_dart: ^0.10.4

@@ -6,13 +6,13 @@ packages:
 
 scripts:
     analyze:
-      run: melos exec -- "flutter analyze"
-      description: Run `flutter analyze` for all packages
+      run: melos exec -- "dart analyze"
+      description: Run `dart analyze` for all packages
 
     test:
-      run: melos exec -- "flutter test"
-      description: Run `flutter test` for all packages
+      run: melos exec -- "dart test"
+      description: Run `dart test` for all packages
 
     get:
-      run: melos exec -- "flutter pub get"
-      description: Run `flutter pub get` for all packages
+      run: melos exec -- "dart pub get"
+      description: Run `dart pub get` for all packages

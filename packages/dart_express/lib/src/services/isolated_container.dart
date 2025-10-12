@@ -1,78 +1,169 @@
 import 'dart:io';
 
 import 'package:dart_express/dart_express.dart';
+import 'package:get_it/get_it.dart';
 
+import '../router/router_interface.dart';
+
+/// A container that can be mounted under a specific prefix with its own router,
+/// middleware pipeline and dependency injection scope.
+///
+/// When mounted it reuses the parent [`Response`] instance so that cookies,
+/// headers, and streaming behaviour are coordinated with the hosting
+/// application while requests are rebuilt against the isolated dependency
+/// scope.
 class IsolatedContainer extends BaseContainer {
-  final String prefix;
-  final Map<String, dynamic> cache = {};
+  IsolatedContainer({
+    String prefix = '',
+    RouterInterface? router,
+    GetIt? container,
+  })  : prefix = _normalizePrefix(prefix),
+        super(
+          router: router,
+          container: container ?? GetIt.asNewInstance(),
+        );
 
-  IsolatedContainer({this.prefix = '', super.router});
+  /// Public prefix exposed for introspection (always normalised to leading slash
+  /// without trailing slash, except when empty).
+  final String prefix;
+
+  final Map<String, dynamic> cache = {};
 
   void get(String path, RequestHandler handler,
       {List<MiddlewareHandler>? middleware}) {
-    addRoute(RequestTypes.GET, _prefixPath(path), handler,
+    addRoute(RequestTypes.GET, _normalizeLocalPath(path), handler,
         middleware: middleware);
   }
 
   void post(String path, RequestHandler handler,
       {List<MiddlewareHandler>? middleware}) {
-    addRoute(RequestTypes.POST, _prefixPath(path), handler,
+    addRoute(RequestTypes.POST, _normalizeLocalPath(path), handler,
         middleware: middleware);
   }
 
   void put(String path, RequestHandler handler,
       {List<MiddlewareHandler>? middleware}) {
-    addRoute(RequestTypes.PUT, _prefixPath(path), handler,
+    addRoute(RequestTypes.PUT, _normalizeLocalPath(path), handler,
         middleware: middleware);
   }
 
   void patch(String path, RequestHandler handler,
       {List<MiddlewareHandler>? middleware}) {
-    addRoute(RequestTypes.PATCH, _prefixPath(path), handler,
+    addRoute(RequestTypes.PATCH, _normalizeLocalPath(path), handler,
         middleware: middleware);
   }
 
   void delete(String path, RequestHandler handler,
       {List<MiddlewareHandler>? middleware}) {
-    addRoute(RequestTypes.DELETE, _prefixPath(path), handler,
+    addRoute(RequestTypes.DELETE, _normalizeLocalPath(path), handler,
         middleware: middleware);
   }
 
   void options(String path, RequestHandler handler,
       {List<MiddlewareHandler>? middleware}) {
-    addRoute(RequestTypes.OPTIONS, _prefixPath(path), handler,
+    addRoute(RequestTypes.OPTIONS, _normalizeLocalPath(path), handler,
         middleware: middleware);
   }
 
-  String _prefixPath(String path) {
-    if (prefix.isEmpty) return path;
-    return prefix + (path.startsWith('/') ? path : '/$path');
-  }
-
+  /// Mounts this container into the provided [app], delegating only requests
+  /// whose path matches the configured prefix via the parent router. This keeps
+  /// path normalisation and parameter extraction consistent with the main
+  /// routing strategy.
   void mount(DartExpress app) {
-    app.use((req, res, next) async {
-      if (req.uri.path.startsWith(prefix)) {
-        await handleRequest(req.httpRequest);
-      } else {
-        await next();
-      }
-    });
+    final mountPrefix = prefix.isEmpty ? '/' : prefix;
+    app.router.addIsolatedRouter(
+      mountPrefix,
+      _IsolatedRouterDelegate(this),
+    );
   }
 
-  Future<void> listen(int port) async {
-    final server = await HttpServer.bind(InternetAddress.anyIPv4, port);
+  /// Optional helper to run this container as a standalone service.
+  Future<void> listen(int port, {InternetAddress? address}) async {
+    address ??= InternetAddress.anyIPv4;
+    final server = await HttpServer.bind(address, port);
     print('Isolated container listening on port ${server.port}');
-    await for (HttpRequest httpRequest in server) {
+    await for (final httpRequest in server) {
       await handleRequest(httpRequest);
     }
   }
 
   @override
-  Future<void> onDispose() {
-    // TODO: implement onDispose
-    // Perform any cleanup or resource release here
-    cache.clear();
+  String resolveRoutePath(Request request) {
+    if (prefix.isEmpty) return request.uri.path;
 
+    final path = request.uri.path;
+    if (path == prefix || path == '$prefix/') {
+      return '/';
+    }
+
+    final prefixedWithSlash = prefix.isEmpty ? '/' : '$prefix/';
+    if (path.startsWith(prefixedWithSlash)) {
+      final trimmed = path.substring(prefix.length);
+      if (trimmed.isEmpty) return '/';
+      return trimmed.startsWith('/') ? trimmed : '/$trimmed';
+    }
+
+    return request.uri.path;
+  }
+
+  @override
+  Future<void> onDispose() {
+    cache.clear();
     return super.onDispose();
+  }
+
+  static String _normalizeLocalPath(String path) {
+    if (path.isEmpty) return '/';
+    return path.startsWith('/') ? path : '/$path';
+  }
+
+  static String _normalizePrefix(String prefix) {
+    var value = prefix.trim();
+    if (value.isEmpty || value == '/') {
+      return '';
+    }
+    if (!value.startsWith('/')) {
+      value = '/$value';
+    }
+    if (value.endsWith('/') && value.length > 1) {
+      value = value.substring(0, value.length - 1);
+    }
+    return value;
+  }
+}
+
+class _IsolatedRouterDelegate implements RouterInterface {
+  _IsolatedRouterDelegate(this.container);
+
+  final IsolatedContainer container;
+
+  @override
+  void addRoute(String method, String path, RequestHandler handler) {
+    container.router.addRoute(method, path, handler);
+  }
+
+  @override
+  void addIsolatedRouter(String prefix, RouterInterface router) {
+    container.router.addIsolatedRouter(prefix, router);
+  }
+
+  @override
+  RouteMatch? findRoute(String method, String path) {
+    final delegateMatch = container.router.findRoute(method, path);
+    if (delegateMatch == null) {
+      return null;
+    }
+
+    return RouteMatch(
+      (parentRequest, parentResponse) async {
+        final scopedRequest = Request.from(
+          parentRequest.httpRequest,
+          container: container.container,
+        );
+
+        await container.processRequest(scopedRequest, parentResponse);
+      },
+      pathParams: delegateMatch.pathParams,
+    );
   }
 }

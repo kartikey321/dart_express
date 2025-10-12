@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:dart_express/dart_express.dart';
 import 'package:dart_express/src/middleware/cookies_parser.dart';
 
+/// Common HTTP method constants used across the framework.
 class RequestTypes {
   static const String GET = 'GET';
   static const String POST = 'POST';
@@ -15,7 +17,8 @@ class RequestTypes {
 }
 
 /// DartExpress is a lightweight web framework for Dart, inspired by Express.js.
-
+/// Provides routing helpers, middleware registration and server lifecycle
+/// management around a standard [HttpServer].
 class DartExpress extends BaseContainer {
   DartExpress({
     bool useCookieParser = true,
@@ -27,48 +30,86 @@ class DartExpress extends BaseContainer {
     }
   }
 
+  /// Mounts a controller under the provided [prefix]. Routes registered inside
+  /// the controller will automatically inherit the prefix.
   void useController(String prefix, Controller controller) {
     controller.initialize(this, prefix: prefix);
   }
 
+  /// Registers a `GET` handler at [path]. Optional [middleware] run after
+  /// global middleware but before the handler executes.
   void get(String path, RequestHandler handler,
       {List<MiddlewareHandler>? middleware}) {
     addRoute(RequestTypes.GET, path, handler, middleware: middleware);
   }
 
+  /// Registers a `POST` handler at [path]. Optional [middleware] run after
+  /// global middleware but before the handler executes.
   void post(String path, RequestHandler handler,
       {List<MiddlewareHandler>? middleware}) {
     addRoute(RequestTypes.POST, path, handler, middleware: middleware);
   }
 
+  /// Registers a `PUT` handler at [path]. Optional [middleware] run after
+  /// global middleware but before the handler executes.
   void put(String path, RequestHandler handler,
       {List<MiddlewareHandler>? middleware}) {
     addRoute(RequestTypes.PUT, path, handler, middleware: middleware);
   }
 
+  /// Registers a `PATCH` handler at [path]. Optional [middleware] run after
+  /// global middleware but before the handler executes.
   void patch(String path, RequestHandler handler,
       {List<MiddlewareHandler>? middleware}) {
     addRoute(RequestTypes.PATCH, path, handler, middleware: middleware);
   }
 
+  /// Registers a `DELETE` handler at [path]. Optional [middleware] run after
+  /// global middleware but before the handler executes.
   void delete(String path, RequestHandler handler,
       {List<MiddlewareHandler>? middleware}) {
     addRoute(RequestTypes.DELETE, path, handler, middleware: middleware);
   }
 
+  /// Registers an `OPTIONS` handler at [path]. Optional [middleware] run after
+  /// global middleware but before the handler executes.
   void options(String path, RequestHandler handler,
       {List<MiddlewareHandler>? middleware}) {
     addRoute(RequestTypes.OPTIONS, path, handler, middleware: middleware);
   }
 
-  Future<void> listen(int port) async {
-    final server = await HttpServer.bind(InternetAddress.anyIPv4, port);
+  final Map<HttpServer, Future<void>> _serverLifecycles = {};
+
+  /// Binds an [HttpServer] on the provided [port] (and optional [address]) and
+  /// starts processing incoming requests in the background. The returned server
+  /// can be closed by the caller when shutdown is required or during tests.
+  Future<HttpServer> listen(
+    int port, {
+    InternetAddress? address,
+  }) async {
+    address ??= InternetAddress.anyIPv4;
+    final server = await HttpServer.bind(address, port);
     print('Server listening on port ${server.port}');
-    await for (HttpRequest httpRequest in server) {
-      await handleRequest(httpRequest);
+
+    final lifecycle = _serve(server);
+    _serverLifecycles[server] = lifecycle;
+    lifecycle.whenComplete(() => _serverLifecycles.remove(server));
+
+    return server;
+  }
+
+  /// Awaits the internal request-processing loop for [server], ensuring any
+  /// teardown logic has completed once the server has been closed. Useful for
+  /// integration tests where the server is created and disposed per test case.
+  Future<void> waitUntilClosed(HttpServer server) async {
+    final lifecycle = _serverLifecycles[server];
+    if (lifecycle != null) {
+      await lifecycle;
     }
   }
 
+  /// Generates a CORS middleware using the provided allow lists. Handles
+  /// pre-flight requests and applies common security headers.
   MiddlewareHandler cors({
     List<String> allowedOrigins = const ['*'],
     List<String> allowedMethods = RequestTypes.allTypes,
@@ -86,9 +127,18 @@ class DartExpress extends BaseContainer {
             (allowedOrigins.contains('*') || allowedOrigins.contains(origin));
       }
 
+      final shouldEchoOrigin =
+          allowedOrigins.isNotEmpty && !allowedOrigins.contains('*');
+
+      if (shouldEchoOrigin && origin != null) {
+        response.setHeader('Vary', 'Origin');
+      }
+
       if (isAllowedOrigin(origin)) {
         // Set CORS headers
-        response.setHeader('Access-Control-Allow-Origin', origin!);
+        final allowOriginHeader =
+            allowedOrigins.contains('*') && !allowCredentials ? '*' : origin!;
+        response.setHeader('Access-Control-Allow-Origin', allowOriginHeader);
         response.setHeader(
             'Access-Control-Allow-Methods', allowedMethods.join(', '));
         response.setHeader(
@@ -131,6 +181,9 @@ class DartExpress extends BaseContainer {
     };
   }
 
+  /// Builds a rate limiter middleware backed by [store] (or an in-memory
+  /// default). Requests exceeding [maxRequests] within [window] receive a 429
+  /// response. Customize [keyGenerator] to throttle by user/token/etc.
   MiddlewareHandler rateLimiter({
     int maxRequests = 100,
     Duration window = const Duration(minutes: 1),
@@ -155,5 +208,15 @@ class DartExpress extends BaseContainer {
 
       await next();
     };
+  }
+
+  Future<void> _serve(HttpServer server) async {
+    try {
+      await for (final httpRequest in server) {
+        await handleRequest(httpRequest);
+      }
+    } finally {
+      await onDispose();
+    }
   }
 }

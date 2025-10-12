@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/packages/dart_express/melos_dart_express.iml" filepath="$PROJECT_DIR$/packages/dart_express/melos_dart_express.iml" />
-      <module fileurl="file://$PROJECT_DIR$/apps/dart_express_examples/mongo_example/melos_mongo_example.iml" filepath="$PROJECT_DIR$/apps/dart_express_examples/mongo_example/melos_mongo_example.iml" />
-      <module fileurl="file://$PROJECT_DIR$/melos_dart_express_project.iml" filepath="$PROJECT_DIR$/melos_dart_express_project.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/dart_express.iml" filepath="$PROJECT_DIR$/.idea/dart_express.iml" />
     </modules>
   </component>
 </project>

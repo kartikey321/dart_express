@@ -3,34 +3,41 @@ import 'package:meta/meta.dart';
 import '../models/middleware.dart';
 import 'dart_express.dart';
 
+/// Helper passed to controllers so they can register routes relative to their
+/// configured prefix without duplicating boilerplate.
 class ControllerOptions {
   late final DartExpress _app;
   late final String _prefix;
   ControllerOptions(this._app, this._prefix);
+  /// Registers a `GET` handler relative to the controller prefix.
   void get(String path, RequestHandler handler,
       {List<MiddlewareHandler>? middleware}) {
     final fullPath = _joinPaths(path);
     _app.get(fullPath, handler, middleware: middleware);
   }
 
+  /// Registers a `POST` handler relative to the controller prefix.
   void post(String path, RequestHandler handler,
       {List<MiddlewareHandler>? middleware}) {
     final fullPath = _joinPaths(path);
     _app.post(fullPath, handler, middleware: middleware);
   }
 
+  /// Registers a `PUT` handler relative to the controller prefix.
   void put(String path, RequestHandler handler,
       {List<MiddlewareHandler>? middleware}) {
     final fullPath = _joinPaths(path);
     _app.put(fullPath, handler, middleware: middleware);
   }
 
+  /// Registers a `PATCH` handler relative to the controller prefix.
   void patch(String path, RequestHandler handler,
       {List<MiddlewareHandler>? middleware}) {
     final fullPath = _joinPaths(path);
     _app.patch(fullPath, handler, middleware: middleware);
   }
 
+  /// Registers a `DELETE` handler relative to the controller prefix.
   void delete(String path, RequestHandler handler,
       {List<MiddlewareHandler>? middleware}) {
     final fullPath = _joinPaths(path);
@@ -44,6 +51,8 @@ class ControllerOptions {
   }
 }
 
+/// Base class for feature modules that register routes using
+/// [ControllerOptions]. Override [registerRoutes] to declare handlers.
 abstract class Controller {
   late final ControllerOptions _options;
   @mustCallSuper
@@ -52,5 +61,6 @@ abstract class Controller {
     registerRoutes(_options);
   }
 
+  /// Subclasses implement this to register routes.
   void registerRoutes(ControllerOptions options);
 }

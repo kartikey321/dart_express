@@ -42,7 +42,7 @@ class CookieParser {
       if (name.isEmpty) continue;
 
       String value = parts.length > 1 ? parts.sublist(1).join('=').trim() : '';
-      
+
       if (!allowEmptyValues && value.isEmpty) continue;
 
       if (decodeValues) {

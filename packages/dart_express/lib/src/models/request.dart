@@ -1,12 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:dart_express/dart_express.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mime/mime.dart';
+import 'package:uuid/uuid.dart';
 
 /// Represents an incoming HTTP request flowing through the framework.
 ///
@@ -19,6 +19,8 @@ class Request {
   late final Map<String, String> query;
   final Session session;
   final GetIt container;
+  final int maxBodySize;
+  final int maxFileSize;
   Object? _parsedBody;
   Future<Uint8List>? _bodyBytesFuture;
   _FormDataPayload? _multipartPayload;
@@ -26,9 +28,14 @@ class Request {
   final bool _isSessionNew;
   List<Cookie> cookies = [];
 
-  Request(this.httpRequest, this.session, this.container,
-      {bool isSessionNew = false})
-      : _isSessionNew = isSessionNew {
+  Request(
+    this.httpRequest,
+    this.session,
+    this.container, {
+    bool isSessionNew = false,
+    this.maxBodySize = 10 * 1024 * 1024,
+    this.maxFileSize = 100 * 1024 * 1024,
+  }) : _isSessionNew = isSessionNew {
     query = httpRequest.uri.queryParameters;
   }
 
@@ -98,6 +105,8 @@ class Request {
   factory Request.from(
     HttpRequest httpRequest, {
     required GetIt container,
+    int maxBodySize = 10 * 1024 * 1024,
+    int maxFileSize = 100 * 1024 * 1024,
   }) {
     Cookie? sessionCookie;
     bool isSessionNew = false;
@@ -112,12 +121,19 @@ class Request {
 
     final session = Session(sessionCookie!.value);
 
-    return Request(httpRequest, session, container, isSessionNew: isSessionNew);
+    return Request(
+      httpRequest,
+      session,
+      container,
+      isSessionNew: isSessionNew,
+      maxBodySize: maxBodySize,
+      maxFileSize: maxFileSize,
+    );
   }
 
+  /// Generate a cryptographically secure session ID using UUID v4
   static String _generateSessionId() {
-    return DateTime.now().millisecondsSinceEpoch.toString() +
-        Random().nextInt(1000).toString();
+    return const Uuid().v4();
   }
 
   /// Indicates whether a fresh session identifier was generated for this
@@ -130,9 +146,19 @@ class Request {
   }
 
   // Helper method to read stream fully into a list of bytes to prevent multiple listens
-  static Future<List<int>> consolidateBytes(Stream<List<int>> stream) async {
+  Future<List<int>> consolidateBytes(Stream<List<int>> stream,
+      {int? sizeLimit}) async {
     final buffer = BytesBuilder();
+    var totalSize = 0;
+    final limit = sizeLimit ?? maxFileSize;
+
     await for (final chunk in stream) {
+      totalSize += chunk.length;
+
+      if (totalSize > limit) {
+        throw HttpError(413, 'File too large');
+      }
+
       buffer.add(chunk);
     }
     return buffer.takeBytes();
@@ -146,9 +172,20 @@ class Request {
 
     final future = () async {
       final buffer = BytesBuilder();
+      var totalSize = 0;
+
       await for (final chunk in httpRequest) {
+        totalSize += chunk.length;
+
+        if (totalSize > maxBodySize) {
+          // Drain remaining stream to prevent connection issues
+          await httpRequest.drain();
+          throw HttpError(413, 'Payload Too Large');
+        }
+
         buffer.add(chunk);
       }
+
       return buffer.takeBytes();
     }();
 
@@ -198,10 +235,13 @@ class Request {
       final name = nameMatch.group(1)!;
       final filenameMatch =
           RegExp(r'filename="([^"]*)"').firstMatch(contentDisposition);
-      final bytes = Uint8List.fromList(await consolidateBytes(part));
 
       if (filenameMatch != null) {
+        // This is a file upload - check file size limit
         final filename = filenameMatch.group(1)!;
+        final bytes =
+            Uint8List.fromList(await consolidateBytes(part, sizeLimit: maxFileSize));
+
         final filesForField =
             fileData.putIfAbsent(name, () => <MultipartFile>[]);
         filesForField.add(
@@ -212,6 +252,8 @@ class Request {
           ),
         );
       } else {
+        // Regular form field
+        final bytes = Uint8List.fromList(await consolidateBytes(part));
         fieldData[name] = utf8.decode(bytes);
       }
     }

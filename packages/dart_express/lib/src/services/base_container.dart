@@ -165,24 +165,35 @@ abstract class BaseContainer {
     if (_errorHandler != null) {
       try {
         await _errorHandler!(error, request, response);
-      } catch (e) {
-        print('Error in error handler: $e');
-        response.setStatus(HttpStatus.internalServerError);
-        response.json({
-          'error': 'Internal Server Error',
-          'message': 'Error handling the original error'
-        });
+        // Ensure error handler actually sent a response
+        if (!response.isSent) {
+          print('Warning: Error handler did not send response, using fallback');
+          _sendDefaultError(error, response, stackTrace);
+        }
+      } catch (e, st) {
+        print('Error in error handler: $e\n$st');
+        // Fall through to default error handling
+        if (!response.isSent) {
+          _sendDefaultError(error, response, stackTrace);
+        }
       }
     } else {
-      print('Unhandled error: $error\nStackTrace: $stackTrace');
-      if (error is HttpError) {
-        response.setStatus(error.statusCode);
-        response.json({'error': error.message, 'data': error.data});
-      } else {
-        response.setStatus(HttpStatus.internalServerError);
-        response.json(
-            {'error': 'Internal Server Error', 'message': error.toString()});
-      }
+      _sendDefaultError(error, response, stackTrace);
+    }
+  }
+
+  void _sendDefaultError(
+      dynamic error, Response response, StackTrace stackTrace) {
+    if (response.isSent) return;
+
+    print('Unhandled error: $error\nStackTrace: $stackTrace');
+    if (error is HttpError) {
+      response.setStatus(error.statusCode);
+      response.json({'error': error.message, 'data': error.data});
+    } else {
+      response.setStatus(HttpStatus.internalServerError);
+      response.json(
+          {'error': 'Internal Server Error', 'message': error.toString()});
     }
   }
 

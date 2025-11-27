@@ -1,8 +1,9 @@
+import 'dart:async';
 import 'dart:io';
 
 import '../../dart_express.dart';
 
-typedef ErrorHandler = Future<void> Function(
+typedef ErrorHandler = FutureOr<void> Function(
     dynamic error, Request request, Response response);
 
 class HttpError implements Exception {

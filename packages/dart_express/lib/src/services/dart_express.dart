@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:async/async.dart';
 import 'package:dart_express/dart_express.dart';
 import 'package:dart_express/src/middleware/cookies_parser.dart';
 
@@ -20,8 +22,20 @@ class RequestTypes {
 /// Provides routing helpers, middleware registration and server lifecycle
 /// management around a standard [HttpServer].
 class DartExpress extends BaseContainer {
+  final int maxBodySize;
+  final int maxFileSize;
+  final Duration requestTimeout;
+  final Duration shutdownTimeout;
+  int _activeRequests = 0;
+  bool _isShuttingDown = false;
+  final DateTime _startTime = DateTime.now();
+
   DartExpress({
     bool useCookieParser = true,
+    this.maxBodySize = 10 * 1024 * 1024, // 10MB
+    this.maxFileSize = 100 * 1024 * 1024, // 100MB
+    this.requestTimeout = const Duration(seconds: 30),
+    this.shutdownTimeout = const Duration(seconds: 30),
     super.container,
     super.router,
   }) {
@@ -79,6 +93,18 @@ class DartExpress extends BaseContainer {
   }
 
   final Map<HttpServer, Future<void>> _serverLifecycles = {};
+
+  @override
+  Future<void> handleRequest(HttpRequest httpRequest) async {
+    final request = Request.from(
+      httpRequest,
+      container: container,
+      maxBodySize: maxBodySize,
+      maxFileSize: maxFileSize,
+    );
+    final response = Response();
+    await processRequest(request, response);
+  }
 
   /// Binds an [HttpServer] on the provided [port] (and optional [address]) and
   /// starts processing incoming requests in the background. The returned server
@@ -210,13 +236,103 @@ class DartExpress extends BaseContainer {
     };
   }
 
+  /// Enable a simple health check endpoint at /health
+  void enableHealthCheck() {
+    get('/health', (req, res) {
+      res.json({
+        'status': 'ok',
+        'uptime': DateTime.now().difference(_startTime).inSeconds,
+        'activeRequests': _activeRequests,
+      });
+    });
+  }
+
+  /// Gracefully closes all servers, waiting for active requests to complete
+  Future<void> close() async {
+    _isShuttingDown = true;
+
+    print(
+        'Graceful shutdown initiated. Waiting for $_activeRequests active requests...');
+
+    final deadline = DateTime.now().add(shutdownTimeout);
+    while (_activeRequests > 0 && DateTime.now().isBefore(deadline)) {
+      await Future.delayed(const Duration(milliseconds: 100));
+    }
+
+    if (_activeRequests > 0) {
+      print(
+          'Warning: Forcefully closing with $_activeRequests active requests');
+    } else {
+      print('All requests completed. Closing servers.');
+    }
+
+    for (final server in _serverLifecycles.keys.toList()) {
+      await server.close(force: _activeRequests > 0);
+    }
+
+    _serverLifecycles.clear();
+  }
+
   Future<void> _serve(HttpServer server) async {
     try {
       await for (final httpRequest in server) {
-        await handleRequest(httpRequest);
+        // Fire and forget - no blocking, trust Dart's event loop
+        unawaited(_handleRequestWithTimeout(httpRequest));
       }
     } finally {
       await onDispose();
+    }
+  }
+
+  Future<void> _handleRequestWithTimeout(HttpRequest httpRequest) async {
+    // Reject new requests during shutdown
+    if (_isShuttingDown) {
+      httpRequest.response
+        ..statusCode = HttpStatus.serviceUnavailable
+        ..headers.add('Connection', 'close')
+        ..write('Server is shutting down')
+        ..close();
+      return;
+    }
+
+    _activeRequests++;
+
+    try {
+      await handleRequest(httpRequest).timeout(
+        requestTimeout,
+        onTimeout: () => throw HttpError(408, 'Request Timeout'),
+      );
+    } catch (error, stackTrace) {
+      await _safelySendErrorResponse(httpRequest, error, stackTrace);
+    } finally {
+      _activeRequests--;
+    }
+  }
+
+  Future<void> _safelySendErrorResponse(
+    HttpRequest httpRequest,
+    dynamic error,
+    StackTrace stackTrace,
+  ) async {
+    try {
+      final statusCode = error is HttpError ? error.statusCode : 500;
+
+      httpRequest.response
+        ..statusCode = statusCode
+        ..headers.contentType = ContentType.json
+        ..write(jsonEncode({
+          'error': error.toString(),
+          'statusCode': statusCode,
+        }));
+
+      await httpRequest.response.close();
+    } catch (_) {
+      // If we can't send error response, just try to close
+      try {
+        await httpRequest.response.close();
+      } catch (_) {
+        // Nothing more we can do
+      }
     }
   }
 }

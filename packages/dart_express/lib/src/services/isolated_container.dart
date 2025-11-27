@@ -15,11 +15,10 @@ import '../router/router_interface.dart';
 class IsolatedContainer extends BaseContainer {
   IsolatedContainer({
     String prefix = '',
-    RouterInterface? router,
+    super.router,
     GetIt? container,
   })  : prefix = _normalizePrefix(prefix),
         super(
-          router: router,
           container: container ?? GetIt.asNewInstance(),
         );
 

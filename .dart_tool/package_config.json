@@ -231,8 +231,8 @@
     }
   ],
   "generator": "pub",
-  "generatorVersion": "3.9.2",
+  "generatorVersion": "3.10.0",
   "flutterRoot": "file:///Users/kartik/Downloads/flutter",
-  "flutterVersion": "3.35.6",
+  "flutterVersion": "3.38.2",
   "pubCache": "file:///Users/kartik/.pub-cache"
 }

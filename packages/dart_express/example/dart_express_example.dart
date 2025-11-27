@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:dart_express/dart_express.dart';
@@ -12,8 +11,12 @@ Future<void> main() async {
 
   // Global middleware.
   app.use(app.cors(allowedOrigins: ['http://localhost:3000']));
-  app.use(app.rateLimiter(maxRequests: 200, window: const Duration(minutes: 1)));
-
+  app.use(
+      app.rateLimiter(maxRequests: 200, window: const Duration(minutes: 1)));
+  app.setErrorHandler((err, req, res) {
+    print(err);
+    res.json({'error': err.toString()}, statusCode: 500);
+  });
   // Simple health endpoint.
   app.get('/health', (req, res) {
     res.json({'status': 'ok', 'timestamp': req.container.get<Clock>().now()});
@@ -63,8 +66,8 @@ class UsersController extends Controller {
 
   Future<void> _getUserById(Request request, Response response) async {
     final id = int.tryParse(request.params['id'] ?? '');
-    final user = _users.firstWhere((entry) => entry['id'] == id,
-        orElse: () => {});
+    final user =
+        _users.firstWhere((entry) => entry['id'] == id, orElse: () => {});
 
     if (user.isEmpty) {
       throw NotFoundError('User $id not found');

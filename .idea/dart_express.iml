@@ -12,6 +12,9 @@
       <excludeFolder url="file://$MODULE_DIR$/packages/dart_express/.dart_tool" />
       <excludeFolder url="file://$MODULE_DIR$/packages/dart_express/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/packages/dart_express/build" />
+      <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/web/dart/dart-express-aot-3.6/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/web/dart/dart-express-aot-3.6/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/web/dart/dart-express-aot-3.6/build" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

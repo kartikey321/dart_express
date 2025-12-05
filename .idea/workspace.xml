@@ -4,20 +4,12 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6b04f6e7-ce86-42f5-af76-80c4f71d2785" name="Changes" comment="enhance security, concurrency, and production readiness&#10;&#10;- Enforce configurable `maxBodySize` and `maxFileSize` limits on requests to prevent memory exhaustion.&#10;- Replace weak session generation with cryptographically secure UUIDs.&#10;- Refactor server loop to handle requests concurrently with timeouts using `unawaited`.&#10;- Add graceful shutdown mechanism to wait for active requests before closing.&#10;- Fix memory leak in `MemoryRateLimitStore` by implementing periodic cleanup of expired keys.&#10;- Harden `BaseContainer` error handling to safely catch exceptions within custom handlers.&#10;- Add `enableHealthCheck()` endpoint helper and update dependencies.">
-      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.ask.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/copilot.data.migration.ask2agent.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/markdown.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/caches/deviceStreaming.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+    <list default="true" id="6b04f6e7-ce86-42f5-af76-80c4f71d2785" name="Changes" comment="feat: add XML configuration files and enhance request handling with improved error logging and request ID tracing">
+      <change afterPath="$PROJECT_DIR$/test/sharkbench/benchmark/web/dart/dart-express-aot-3.6/pubspec.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dart_express.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dart_express.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/libraries/Dart_Packages.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/dart_express/lib/src/models/request.dart" beforeDir="false" afterPath="$PROJECT_DIR$/packages/dart_express/lib/src/models/request.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/dart_express/lib/src/router/listRouter/list_router.dart" beforeDir="false" afterPath="$PROJECT_DIR$/packages/dart_express/lib/src/router/listRouter/list_router.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/dart_express/lib/src/router/radixRouter/radix_router.dart" beforeDir="false" afterPath="$PROJECT_DIR$/packages/dart_express/lib/src/router/radixRouter/radix_router.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/dart_express/lib/src/services/base_container.dart" beforeDir="false" afterPath="$PROJECT_DIR$/packages/dart_express/lib/src/services/base_container.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/dart_express/lib/src/services/dart_express.dart" beforeDir="false" afterPath="$PROJECT_DIR$/packages/dart_express/lib/src/services/dart_express.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/dart_express/lib/src/services/isolated_container.dart" beforeDir="false" afterPath="$PROJECT_DIR$/packages/dart_express/lib/src/services/isolated_container.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/packages/dart_express/tool/bench.dart" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,8 +19,15 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Dart File" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/test/sharkbench" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -130,14 +129,23 @@
       <option name="project" value="LOCAL" />
       <updated>1764250852571</updated>
     </task>
-    <option name="localTasksCounter" value="4" />
+    <task id="LOCAL-00004" summary="feat: add XML configuration files and enhance request handling with improved error logging and request ID tracing">
+      <option name="closed" value="true" />
+      <created>1764918327132</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1764918327132</updated>
+    </task>
+    <option name="localTasksCounter" value="5" />
     <servers />
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="refactor: improve routing and middleware handling in DartExpress framework" />
     <MESSAGE value="feat: add benchmarking tool for HTTP requests with latency reporting" />
     <MESSAGE value="enhance security, concurrency, and production readiness&#10;&#10;- Enforce configurable `maxBodySize` and `maxFileSize` limits on requests to prevent memory exhaustion.&#10;- Replace weak session generation with cryptographically secure UUIDs.&#10;- Refactor server loop to handle requests concurrently with timeouts using `unawaited`.&#10;- Add graceful shutdown mechanism to wait for active requests before closing.&#10;- Fix memory leak in `MemoryRateLimitStore` by implementing periodic cleanup of expired keys.&#10;- Harden `BaseContainer` error handling to safely catch exceptions within custom handlers.&#10;- Add `enableHealthCheck()` endpoint helper and update dependencies." />
-    <option name="LAST_COMMIT_MESSAGE" value="enhance security, concurrency, and production readiness&#10;&#10;- Enforce configurable `maxBodySize` and `maxFileSize` limits on requests to prevent memory exhaustion.&#10;- Replace weak session generation with cryptographically secure UUIDs.&#10;- Refactor server loop to handle requests concurrently with timeouts using `unawaited`.&#10;- Add graceful shutdown mechanism to wait for active requests before closing.&#10;- Fix memory leak in `MemoryRateLimitStore` by implementing periodic cleanup of expired keys.&#10;- Harden `BaseContainer` error handling to safely catch exceptions within custom handlers.&#10;- Add `enableHealthCheck()` endpoint helper and update dependencies." />
+    <MESSAGE value="feat: add XML configuration files and enhance request handling with improved error logging and request ID tracing" />
+    <option name="LAST_COMMIT_MESSAGE" value="feat: add XML configuration files and enhance request handling with improved error logging and request ID tracing" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

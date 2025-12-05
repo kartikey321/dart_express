@@ -2,9 +2,11 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:async/async.dart';
 import 'package:dart_express/dart_express.dart';
 import 'package:dart_express/src/middleware/cookies_parser.dart';
+import 'package:get_it/get_it.dart';
+import 'package:logger/logger.dart';
+import '../router/router_interface.dart';
 
 /// Common HTTP method constants used across the framework.
 class RequestTypes {
@@ -36,9 +38,11 @@ class DartExpress extends BaseContainer {
     this.maxFileSize = 100 * 1024 * 1024, // 100MB
     this.requestTimeout = const Duration(seconds: 30),
     this.shutdownTimeout = const Duration(seconds: 30),
-    super.container,
-    super.router,
-  }) {
+    Logger? logger,
+    RouterInterface? router,
+    GetIt? container,
+  }) : super(container: container, router: router, logger: logger) {
+    _validateConfig();
     if (useCookieParser) {
       use(CookieParser.middleware());
     }
@@ -112,10 +116,11 @@ class DartExpress extends BaseContainer {
   Future<HttpServer> listen(
     int port, {
     InternetAddress? address,
+    bool shared = false,
   }) async {
     address ??= InternetAddress.anyIPv4;
-    final server = await HttpServer.bind(address, port);
-    print('Server listening on port ${server.port}');
+    final server = await HttpServer.bind(address, port, shared: shared);
+    logger.i('Server listening on port ${server.port}');
 
     final lifecycle = _serve(server);
     _serverLifecycles[server] = lifecycle;
@@ -143,6 +148,11 @@ class DartExpress extends BaseContainer {
     bool allowCredentials = false,
     int maxAge = 86400,
   }) {
+    if (allowCredentials && allowedOrigins.contains('*')) {
+      throw ArgumentError(
+          'allowCredentials cannot be used with wildcard origins (*)');
+    }
+
     return (request, response, next) async {
       final origin = request.headers.value('Origin');
       final method = request.method;
@@ -177,20 +187,25 @@ class DartExpress extends BaseContainer {
 
         // Handle preflight OPTIONS request
         if (method == 'OPTIONS') {
+          response.setHeader('Vary',
+              response.headers['Vary'] == null ? 'Origin' : response.headers['Vary']!);
+          response.setHeader('Access-Control-Allow-Headers',
+              request.headers.value('access-control-request-headers') ??
+                  allowedHeaders.join(', '));
           response.setStatus(HttpStatus.noContent); // 204 No Content
           response.send(request.httpRequest.response);
           return;
         }
       } else if (origin != null && !isAllowedOrigin(origin)) {
         // If origin is not allowed, log and respond with 403 Forbidden
-        print('CORS Denied - Origin not allowed: $origin');
+        logger.w('CORS denied - origin not allowed: $origin');
         response.setStatus(HttpStatus.forbidden);
         response.text('CORS policy does not allow this origin.');
         response.send(request.httpRequest.response);
         return;
       } else if (!allowedMethods.contains(method)) {
         // If method is not allowed, respond with 405 Method Not Allowed
-        print('CORS Denied - Method not allowed: $method');
+        logger.w('CORS denied - method not allowed: $method');
         response.setStatus(HttpStatus.methodNotAllowed);
         response.text('Method not allowed.');
         response.send(request.httpRequest.response);
@@ -251,7 +266,7 @@ class DartExpress extends BaseContainer {
   Future<void> close() async {
     _isShuttingDown = true;
 
-    print(
+    logger.i(
         'Graceful shutdown initiated. Waiting for $_activeRequests active requests...');
 
     final deadline = DateTime.now().add(shutdownTimeout);
@@ -260,14 +275,21 @@ class DartExpress extends BaseContainer {
     }
 
     if (_activeRequests > 0) {
-      print(
-          'Warning: Forcefully closing with $_activeRequests active requests');
+      logger.w(
+          'Forcefully closing with $_activeRequests active requests still in-flight');
     } else {
-      print('All requests completed. Closing servers.');
+      logger.i('All requests completed. Closing servers.');
     }
 
+    // Allow a short grace window for late-arriving requests to receive 503s
+    await Future.delayed(const Duration(milliseconds: 50));
+
     for (final server in _serverLifecycles.keys.toList()) {
+      final lifecycle = _serverLifecycles[server];
       await server.close(force: _activeRequests > 0);
+      if (lifecycle != null) {
+        await lifecycle;
+      }
     }
 
     _serverLifecycles.clear();
@@ -314,6 +336,9 @@ class DartExpress extends BaseContainer {
     dynamic error,
     StackTrace stackTrace,
   ) async {
+    logger.e('Request error ${httpRequest.method} ${httpRequest.uri.path} '
+        'reqId=${httpRequest.headers.value('x-request-id') ?? '-'}',
+        error: error, stackTrace: stackTrace, time: DateTime.now());
     try {
       final statusCode = error is HttpError ? error.statusCode : 500;
 
@@ -333,6 +358,25 @@ class DartExpress extends BaseContainer {
       } catch (_) {
         // Nothing more we can do
       }
+    }
+  }
+
+  void _validateConfig() {
+    if (maxBodySize <= 0) {
+      throw ArgumentError('maxBodySize must be positive');
+    }
+    if (maxFileSize <= 0) {
+      throw ArgumentError('maxFileSize must be positive');
+    }
+    if (requestTimeout <= Duration.zero) {
+      throw ArgumentError('requestTimeout must be positive');
+    }
+    if (shutdownTimeout <= Duration.zero) {
+      throw ArgumentError('shutdownTimeout must be positive');
+    }
+    if (maxFileSize > maxBodySize) {
+      logger.w(
+          'maxFileSize ($maxFileSize) is greater than maxBodySize ($maxBodySize); large uploads may hit body limit first.');
     }
   }
 }

@@ -1,0 +1,978 @@
+Project Overview
+===============
+
+Project Statistics:
+Total Files: 8
+Total Size: 25.59 KB
+
+File Types:
+  .dart: 8 files
+
+Detected Technologies:
+
+Folder Structure (Tree)
+=====================
+Legend: ✓ = Included in output, ✗ = Excluded from output
+
+├── dart_express_test.dart (6.25 KB) ✓
+├── helpers/
+│   └── test_server_harness.dart (3.06 KB) ✓
+├── integration/
+│   └── server_lifecycle_test.dart (1.81 KB) ✓
+├── performance/
+│   └── concurrency_test.dart (1.16 KB) ✓
+├── security/
+│   └── security_test.dart (2.24 KB) ✓
+└── unit/
+    ├── middleware_test.dart (2.95 KB) ✓
+    ├── request_test.dart (6.18 KB) ✓
+    └── router_test.dart (1.94 KB) ✓
+
+==============
+
+File Name: dart_express_test.dart
+Size: 6.25 KB
+Code:
+import 'dart:io';
+
+import 'package:dart_express/dart_express.dart';
+import 'package:http/http.dart' as http;
+import 'package:test/test.dart';
+
+void main() {
+  group('Application', () {
+    late TestServerHarness harness;
+
+    setUp(() => harness = TestServerHarness());
+
+    tearDown(() async => harness.dispose());
+
+    test('GET / returns 200 with correct body', () async {
+      harness.app
+          .get('/', (Request req, Response res) => res.text('Hello World!'));
+
+      final response = await harness.get('/');
+
+      expect(response.statusCode, 200);
+      expect(response.body, 'Hello World!');
+      expect(
+          response.headers['set-cookie'], contains(Request.sessionCookieName));
+    });
+
+    test('POST / returns 201 with JSON response', () async {
+      harness.app.post(
+        '/',
+        (Request req, Response res) =>
+            res.json({'success': true}, statusCode: 201),
+      );
+
+      final response = await harness.post('/');
+
+      expect(response.statusCode, 201);
+      expect(response.headers['content-type'], 'application/json');
+      expect(response.body, '{"success":true}');
+    });
+
+    test('Unknown route returns 404 with JSON payload', () async {
+      final response = await harness.get('/not_found');
+
+      expect(response.statusCode, 404);
+      expect(response.headers['content-type'], 'application/json');
+    });
+    test('Reuses existing session cookie when provided', () async {
+      final cookieHeader = '${Request.sessionCookieName}=existing-session';
+
+      harness.app.get('/', (req, res) => res.text('OK'));
+
+      final response = await harness.get(
+        '/',
+        headers: {HttpHeaders.cookieHeader: cookieHeader},
+      );
+
+      expect(response.statusCode, 200);
+      // No duplicate cookie should be issued when already provided
+      expect(response.headers['set-cookie'], isNull);
+    });
+  });
+
+  group('Middleware', () {
+    late TestServerHarness harness;
+
+    setUp(() => harness = TestServerHarness());
+    tearDown(() async => harness.dispose());
+
+    test('Runs middleware in order', () async {
+      final order = <int>[];
+
+      harness.app.use((req, res, next) {
+        order.add(1);
+        return next();
+      });
+
+      harness.app.use((req, res, next) {
+        order.add(2);
+        return next();
+      });
+
+      harness.app.get('/middleware', (req, res) {
+        order.add(3);
+        res.text('OK');
+      });
+
+      final response = await harness.get('/middleware');
+
+      expect(response.statusCode, 200);
+      expect(order, [1, 2, 3]);
+    });
+
+    test('Middleware can modify response', () async {
+      harness.app.use((req, res, next) {
+        res.headers['X-Custom-Header'] = '123';
+        return next();
+      });
+
+      harness.app.get('/header', (req, res) => res.text('OK'));
+
+      final response = await harness.get('/header');
+
+      expect(response.statusCode, 200);
+      expect(response.headers['x-custom-header'], '123');
+    });
+  });
+
+  group('Error Handling', () {
+    late TestServerHarness harness;
+
+    setUp(() => harness = TestServerHarness());
+    tearDown(() async => harness.dispose());
+
+    test('Unhandled error returns 500', () async {
+      harness.app.get('/error', (req, res) => throw Exception('Test Error'));
+
+      final response = await harness.get('/error');
+
+      expect(response.statusCode, 500);
+      expect(response.headers['content-type'], 'application/json');
+    });
+  });
+
+  group('Route Parameters', () {
+    late TestServerHarness harness;
+
+    setUp(() => harness = TestServerHarness());
+    tearDown(() async => harness.dispose());
+
+    test('Parses route parameters', () async {
+      harness.app.get('/users/:id', (req, res) {
+        res.text('User ID: ${req.params['id']}');
+      });
+
+      final response = await harness.get('/users/123');
+
+      expect(response.statusCode, 200);
+      expect(response.body, 'User ID: 123');
+    });
+  });
+
+  group('Isolated Container', () {
+    late TestServerHarness harness;
+
+    setUp(() => harness = TestServerHarness());
+    tearDown(() async => harness.dispose());
+
+    test('Routes and middleware execute in isolated scope', () async {
+      final isolated = IsolatedContainer(prefix: '/island');
+      isolated.use((req, res, next) {
+        res.setHeader('X-Isolated', 'true');
+        return next();
+      });
+      isolated.get('/', (req, res) => res.text('Isolated Root'));
+
+      isolated.mount(harness.app);
+
+      final response = await harness.get('/island');
+
+      expect(response.statusCode, 200);
+      expect(response.body, 'Isolated Root');
+      expect(response.headers['x-isolated'], 'true');
+    });
+
+    test('Uses independent dependency injection scope', () async {
+      final isolated = IsolatedContainer(prefix: '/island');
+
+      harness.app.inject<Dependency>(Dependency('parent'));
+      isolated.inject<Dependency>(Dependency('isolated'));
+
+      isolated.get('/value', (req, res) {
+        final dep = req.container.get<Dependency>();
+        res.json({'value': dep.id});
+      });
+
+      isolated.mount(harness.app);
+
+      final response = await harness.get('/island/value');
+
+      expect(response.statusCode, 200);
+      expect(response.body, '{"value":"isolated"}');
+
+      final parentResponse = await harness.get('/missing');
+      expect(parentResponse.statusCode, 404);
+    });
+  });
+}
+
+class TestServerHarness {
+  final DartExpress app = DartExpress();
+  HttpServer? _server;
+
+  Future<http.Response> get(String path, {Map<String, String>? headers}) async {
+    await _ensureServer();
+    return http.get(_uri(path), headers: headers);
+  }
+
+  Future<http.Response> post(String path,
+      {Object? body, Map<String, String>? headers}) async {
+    await _ensureServer();
+    return http.post(_uri(path), body: body, headers: headers);
+  }
+
+  Future<void> dispose() async {
+    if (_server != null) {
+      await _server!.close(force: true);
+      await app.waitUntilClosed(_server!);
+      _server = null;
+    } else {
+      await app.onDispose();
+    }
+  }
+
+  Future<void> _ensureServer() async {
+    if (_server != null) {
+      return;
+    }
+
+    _server = await app.listen(0, address: InternetAddress.loopbackIPv4);
+  }
+
+  Uri _uri(String path) {
+    final normalized = path.startsWith('/') ? path : '/$path';
+    return Uri.parse('http://localhost:${_server!.port}$normalized');
+  }
+}
+
+class Dependency {
+  Dependency(this.id);
+  final String id;
+}
+
+-------- [ Separator ] ------
+
+File Name: helpers/test_server_harness.dart
+Size: 3.06 KB
+Code:
+import 'dart:async';
+import 'dart:io';
+
+import 'package:dart_express/dart_express.dart';
+import 'package:http/http.dart' as http;
+
+/// Lightweight harness that spins up a [DartExpress] instance on a random
+/// ephemeral port and exposes helpers for common request patterns used in
+/// tests.
+class TestServerHarness {
+  TestServerHarness({DartExpress? app, InternetAddress? address})
+      : app = app ?? DartExpress(),
+        address = address ?? InternetAddress.loopbackIPv4;
+
+  final DartExpress app;
+  final InternetAddress address;
+  HttpServer? _server;
+  int? _boundPort;
+
+  int get port => _boundPort ?? _server?.port ?? 0;
+
+  /// Starts the underlying [HttpServer] if not already running.
+  Future<void> start() async {
+    if (_server != null) return;
+    _server = await app.listen(0, address: address);
+    _boundPort = _server?.port;
+  }
+
+  /// Resolved absolute [Uri] for the given [path].
+  Uri uri(String path) {
+    final normalized = path.startsWith('/') ? path : '/$path';
+    return Uri.parse('http://${address.address}:${port}$normalized');
+  }
+
+  Future<http.Response> get(String path,
+      {Map<String, String>? headers}) async {
+    await start();
+    return http.get(uri(path), headers: headers);
+  }
+
+  Future<http.Response> post(String path,
+      {Object? body, Map<String, String>? headers}) async {
+    await start();
+    return http.post(uri(path), body: body, headers: headers);
+  }
+
+  Future<http.Response> send(
+    String method,
+    String path, {
+    Object? body,
+    Map<String, String>? headers,
+  }) async {
+    await start();
+    final request = http.Request(method, uri(path));
+    if (body != null) {
+      if (body is String) {
+        request.body = body;
+      } else if (body is List<int>) {
+        request.bodyBytes = body;
+      } else if (body is Map<String, String>) {
+        request.bodyFields = body;
+      } else {
+        throw ArgumentError('Unsupported body type: ${body.runtimeType}');
+      }
+    }
+    if (headers != null) {
+      request.headers.addAll(headers);
+    }
+    final streamed = await request.send();
+    return http.Response.fromStream(streamed);
+  }
+
+  Future<http.StreamedResponse> sendStream(
+    String method,
+    String path, {
+    Stream<List<int>>? body,
+    Map<String, String>? headers,
+  }) async {
+    await start();
+    final request = http.StreamedRequest(method, uri(path));
+    if (headers != null) {
+      request.headers.addAll(headers);
+    }
+    if (body != null) {
+      await for (final chunk in body) {
+        request.sink.add(chunk);
+      }
+    }
+    await request.sink.close();
+    return request.send();
+  }
+
+  Future<http.StreamedResponse> sendMultipart(http.MultipartRequest request) {
+    return start().then((_) => request.send());
+  }
+
+  /// Closes the server and underlying container.
+  Future<void> dispose() async {
+    final server = _server;
+    if (server != null) {
+      try {
+        await app.close();
+      } catch (_) {}
+      try {
+        await server.close(force: true);
+      } catch (_) {}
+      await app.waitUntilClosed(server);
+      _server = null;
+    } else {
+      await app.onDispose();
+    }
+  }
+}
+
+-------- [ Separator ] ------
+
+File Name: integration/server_lifecycle_test.dart
+Size: 1.81 KB
+Code:
+import 'dart:async';
+
+import 'package:dart_express/dart_express.dart';
+import 'package:test/test.dart';
+
+import '../helpers/test_server_harness.dart';
+
+void main() {
+  group('Server lifecycle', () {
+    TestServerHarness? harness;
+
+    tearDown(() => harness?.dispose());
+
+    test('waits for in-flight requests on close', () async {
+      final app = DartExpress(
+        requestTimeout: const Duration(seconds: 2),
+        shutdownTimeout: const Duration(seconds: 2),
+      );
+      harness = TestServerHarness(app: app);
+
+      final completer = Completer<void>();
+      harness!.app.get('/slow', (req, res) async {
+        await completer.future;
+        res.text('done');
+      });
+
+      final responseFuture = harness!.get('/slow');
+      await Future.delayed(const Duration(milliseconds: 50));
+
+      final closeFuture = harness!.app.close();
+
+      completer.complete();
+
+      final response = await responseFuture;
+      await closeFuture;
+
+      expect(response.statusCode, 200);
+    });
+
+    test('rejects new requests once shutdown starts', () async {
+      final app = DartExpress(shutdownTimeout: const Duration(seconds: 1));
+      harness = TestServerHarness(app: app);
+      await harness!.start();
+
+      final slowCompleter = Completer<void>();
+      harness!.app.get('/slow', (req, res) async {
+        await slowCompleter.future;
+        res.text('slow');
+      });
+      harness!.app.get('/ok', (req, res) => res.text('ok'));
+
+      final slowFuture = harness!.get('/slow');
+      final shuttingDown = harness!.app.close();
+      await Future.delayed(const Duration(milliseconds: 25));
+      final response = await harness!.get('/ok');
+
+      expect(response.statusCode, 503);
+      expect(response.body, contains('shutting down'));
+
+      slowCompleter.complete();
+      await slowFuture;
+      await shuttingDown;
+    });
+  });
+}
+
+-------- [ Separator ] ------
+
+File Name: performance/concurrency_test.dart
+Size: 1.16 KB
+Code:
+import 'dart:async';
+
+import 'package:dart_express/dart_express.dart';
+import 'package:test/test.dart';
+
+import '../helpers/test_server_harness.dart';
+
+void main() {
+  group('Concurrency', () {
+    late TestServerHarness harness;
+
+    setUp(() => harness = TestServerHarness());
+    tearDown(() => harness.dispose());
+
+    test('handles many concurrent requests without head-of-line blocking',
+        () async {
+      final active = <int>[];
+      var inFlight = 0;
+
+      harness.app.get('/work', (req, res) async {
+        inFlight++;
+        active.add(inFlight);
+        await Future.delayed(const Duration(milliseconds: 40));
+        inFlight--;
+        res.text('ok');
+      });
+
+      final requests =
+          List.generate(40, (_) => harness.get('/work')); // 40 concurrent
+
+      final stopwatch = Stopwatch()..start();
+      final responses = await Future.wait(requests);
+      stopwatch.stop();
+
+      for (final response in responses) {
+        expect(response.statusCode, 200);
+      }
+
+      expect(active.any((c) => c > 1), isTrue);
+      // Sequential would be ~1600ms; allow generous headroom.
+      expect(stopwatch.elapsedMilliseconds, lessThan(1200));
+    });
+  });
+}
+
+-------- [ Separator ] ------
+
+File Name: security/security_test.dart
+Size: 2.24 KB
+Code:
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:dart_express/dart_express.dart';
+import 'package:test/test.dart';
+
+import '../helpers/test_server_harness.dart';
+
+void main() {
+  group('Security & robustness', () {
+    TestServerHarness? harness;
+
+    tearDown(() => harness?.dispose());
+
+    test('times out hanging requests with 408', () async {
+      final app = DartExpress(requestTimeout: const Duration(milliseconds: 75));
+      harness = TestServerHarness(app: app);
+
+      harness!.app.get('/hang', (req, res) async {
+        await Completer<void>().future;
+      });
+
+      final response = await harness!.get('/hang');
+
+      expect(response.statusCode, HttpStatus.requestTimeout);
+      final payload = jsonDecode(response.body) as Map<String, dynamic>;
+      expect(payload['error'], contains('Request Timeout'));
+    });
+
+    test('recovers after rejecting oversized payloads', () async {
+      final app = DartExpress(maxBodySize: 512);
+      harness = TestServerHarness(app: app);
+
+      harness!.app
+        ..post('/upload', (req, res) async {
+          await req.body; // triggers size enforcement
+          res.text('ok');
+        })
+        ..get('/health', (req, res) => res.text('ok'));
+
+      final largeBody = List.filled(2048, 65);
+      final rejection = await harness!.post(
+        '/upload',
+        body: largeBody,
+        headers: {HttpHeaders.contentTypeHeader: 'application/octet-stream'},
+      );
+      final health = await harness!.get('/health');
+
+      expect(rejection.statusCode, HttpStatus.requestEntityTooLarge);
+      expect(jsonDecode(rejection.body), isA<Map>());
+      expect(health.statusCode, HttpStatus.ok);
+      expect(health.body, 'ok');
+    });
+
+    test('uses fallback error handler when custom handler fails', () async {
+      harness = TestServerHarness();
+
+      harness!.app.setErrorHandler((error, req, res) {
+        throw StateError('broken handler');
+      });
+
+      harness!.app.get('/boom', (req, res) => throw Exception('boom'));
+
+      final response = await harness!.get('/boom');
+
+      expect(response.statusCode, HttpStatus.internalServerError);
+      final payload = jsonDecode(response.body) as Map<String, dynamic>;
+      expect(payload['error'], 'Internal Server Error');
+    });
+  });
+}
+
+-------- [ Separator ] ------
+
+File Name: unit/middleware_test.dart
+Size: 2.95 KB
+Code:
+import 'dart:io';
+
+import 'package:dart_express/dart_express.dart';
+import 'package:test/test.dart';
+
+import '../helpers/test_server_harness.dart';
+
+void main() {
+  group('Middleware pipeline', () {
+    late TestServerHarness harness;
+
+    setUp(() => harness = TestServerHarness());
+    tearDown(() => harness.dispose());
+
+    test('executes global middleware before route middleware', () async {
+      final execution = <String>[];
+
+      harness.app.use((req, res, next) async {
+        execution.add('global');
+        await next();
+      });
+
+      harness.app.get(
+        '/ordered',
+        (req, res) {
+          execution.add('handler');
+          res.text('done');
+        },
+        middleware: [
+          (req, res, next) async {
+            execution.add('route');
+            await next();
+          },
+        ],
+      );
+
+      final response = await harness.get('/ordered');
+
+      expect(response.statusCode, 200);
+      expect(execution, ['global', 'route', 'handler']);
+    });
+
+    test('CORS middleware allows configured origins', () async {
+      harness.app.use(
+        harness.app.cors(
+          allowedOrigins: const ['https://example.com'],
+          allowedMethods: const ['GET', 'OPTIONS'],
+          allowCredentials: true,
+        ),
+      );
+
+      harness.app.options('/cors', (req, res) {});
+
+      final response = await harness.send(
+        'OPTIONS',
+        '/cors',
+        headers: {
+          'Origin': 'https://example.com',
+          'Access-Control-Request-Method': 'GET',
+        },
+      );
+
+      expect(response.statusCode, HttpStatus.noContent);
+      expect(response.headers['access-control-allow-origin'],
+          equals('https://example.com'));
+      expect(response.headers['access-control-allow-credentials'], 'true');
+    });
+
+    test('CORS middleware rejects disallowed origins', () async {
+      harness.app.use(
+        harness.app.cors(
+          allowedOrigins: const ['https://allowed.com'],
+        ),
+      );
+      harness.app.get('/cors', (req, res) => res.text('ok'));
+
+      final response = await harness.get(
+        '/cors',
+        headers: {'Origin': 'https://blocked.com'},
+      );
+
+      expect(response.statusCode, HttpStatus.forbidden);
+      expect(response.body, contains('CORS policy'));
+    });
+
+    test('rate limiter returns 429 when limit exceeded', () async {
+      final store = MemoryRateLimitStore();
+      harness.app.use(
+        harness.app.rateLimiter(
+          maxRequests: 2,
+          window: const Duration(seconds: 1),
+          store: store,
+        ),
+      );
+      harness.app.get('/limited', (req, res) => res.text('ok'));
+
+      final first = await harness.get('/limited');
+      final second = await harness.get('/limited');
+      final third = await harness.get('/limited');
+
+      expect(first.statusCode, 200);
+      expect(second.statusCode, 200);
+      expect(third.statusCode, HttpStatus.tooManyRequests);
+      expect(third.body, contains('Rate limit exceeded'));
+
+      store.dispose();
+    });
+  });
+}
+
+-------- [ Separator ] ------
+
+File Name: unit/request_test.dart
+Size: 6.18 KB
+Code:
+import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
+
+import 'package:dart_express/dart_express.dart';
+import 'package:http/http.dart' as http;
+import 'package:test/test.dart';
+
+import '../helpers/test_server_harness.dart';
+
+void main() {
+  group('Request parsing', () {
+    TestServerHarness? harness;
+
+    setUp(() => harness = TestServerHarness());
+
+    tearDown(() => harness?.dispose());
+
+    test('parses JSON bodies and caches the result', () async {
+      harness!.app.post('/json', (req, res) async {
+        final first = await req.body;
+        final second = await req.body;
+        res.json({'first': first, 'sameInstance': identical(first, second)});
+      });
+
+      final response = await harness!.post(
+        '/json',
+        body: '{"message":"hi"}',
+        headers: {HttpHeaders.contentTypeHeader: ContentType.json.mimeType},
+      );
+
+      final payload = jsonDecode(response.body) as Map<String, dynamic>;
+      expect(response.statusCode, 200);
+      expect(payload['first'], equals({'message': 'hi'}));
+      expect(payload['sameInstance'], isTrue);
+    });
+
+    test('parses urlencoded forms', () async {
+      harness!.app.post('/form', (req, res) async {
+        final body = await req.body as Map<String, String>;
+        res.json(body);
+      });
+
+      final response = await harness!.post(
+        '/form',
+        body: 'foo=bar&baz=qux',
+        headers: {
+          HttpHeaders.contentTypeHeader:
+              'application/x-www-form-urlencoded; charset=utf-8'
+        },
+      );
+
+      final payload = jsonDecode(response.body) as Map<String, dynamic>;
+      expect(response.statusCode, 200);
+      expect(payload, containsPair('foo', 'bar'));
+      expect(payload, containsPair('baz', 'qux'));
+    });
+
+    test('returns raw bytes for unknown content type', () async {
+      harness!.app.post('/bytes', (req, res) async {
+        final body = await req.body as Uint8List;
+        res.bytes(body, statusCode: 201);
+      });
+
+      final bytes = utf8.encode('raw-data');
+      final response = await harness!.post(
+        '/bytes',
+        body: bytes,
+        headers: {HttpHeaders.contentTypeHeader: 'application/octet-stream'},
+      );
+
+      expect(response.statusCode, 201);
+      expect(response.bodyBytes, bytes);
+    });
+
+    test('rejects payload exceeding maxBodySize with 413', () async {
+      await harness?.dispose();
+      harness = TestServerHarness(
+        app: DartExpress(maxBodySize: 256),
+      );
+      harness!.app.post('/limit', (req, res) async {
+        await req.body; // Triggers body read and size enforcement
+        res.text('ok');
+      });
+
+      final body = List.filled(1024, 65); // 1KB
+      final response = await harness!.post(
+        '/limit',
+        body: body,
+        headers: {HttpHeaders.contentTypeHeader: 'application/octet-stream'},
+      );
+
+      expect(response.statusCode, 413);
+      final payload = jsonDecode(response.body) as Map<String, dynamic>;
+      expect(payload['error'], contains('Payload Too Large'));
+    });
+  });
+
+  group('Multipart parsing', () {
+    TestServerHarness? harness;
+
+    setUp(() => harness = TestServerHarness());
+    tearDown(() => harness?.dispose());
+
+    test('merges fields and files into formData', () async {
+      await harness!.start();
+      harness!.app.post('/upload', (req, res) async {
+        final formData = await req.formData;
+        res.json({
+          'fields': formData.map(
+            (key, value) => MapEntry(key, value is String ? value : null),
+          ),
+          'fileLengths': formData.map((key, value) => MapEntry(
+              key,
+              value is List
+                  ? (value.first as http.MultipartFile).length
+                  : null)),
+        });
+      });
+
+      final request = http.MultipartRequest(
+        'POST',
+        harness!.uri('/upload'),
+      )
+        ..fields['name'] = 'demo'
+        ..files.add(http.MultipartFile.fromBytes(
+          'avatar',
+          List.filled(10, 1),
+          filename: 'avatar.png',
+        ));
+
+      final streamed = await harness!.sendMultipart(request);
+      final response = await http.Response.fromStream(streamed);
+      final payload = jsonDecode(response.body) as Map<String, dynamic>;
+
+      expect(response.statusCode, 200);
+      expect(payload['fields']['name'], 'demo');
+      expect(payload['fileLengths']['avatar'], 10);
+    });
+
+    test('enforces maxFileSize during multipart parsing', () async {
+      await harness?.dispose();
+      harness = TestServerHarness(
+        app: DartExpress(maxFileSize: 64 * 2, maxBodySize: 1024),
+      );
+
+      await harness!.start();
+      harness!.app.post('/files', (req, res) async {
+        await req.files;
+        res.text('ok');
+      });
+
+      final request = http.MultipartRequest(
+        'POST',
+        harness!.uri('/files'),
+      )..files.add(http.MultipartFile.fromBytes(
+          'file',
+          List.filled(200, 1), // Exceeds maxFileSize
+          filename: 'big.bin',
+        ));
+
+      final response =
+          await http.Response.fromStream(await harness!.sendMultipart(request));
+
+      expect(response.statusCode, 413);
+      final payload = jsonDecode(response.body) as Map<String, dynamic>;
+      expect(payload['error'], contains('File too large'));
+    });
+  });
+
+  group('Session cookies', () {
+    TestServerHarness? harness;
+
+    setUp(() => harness = TestServerHarness());
+    tearDown(() => harness?.dispose());
+
+    test('sets HttpOnly session cookie when missing', () async {
+      harness!.app.get('/session', (req, res) => res.text('OK'));
+
+      final response = await harness!.get('/session');
+
+      final cookie = response.headers[HttpHeaders.setCookieHeader];
+      expect(response.statusCode, 200);
+      expect(cookie, contains(Request.sessionCookieName));
+      expect(cookie, contains('HttpOnly'));
+    });
+
+    test('reuses provided session cookie', () async {
+      final cookieHeader =
+          '${Request.sessionCookieName}=existing-session; Path=/';
+      harness!.app.get('/session', (req, res) => res.text('OK'));
+
+      final response = await harness!.get(
+        '/session',
+        headers: {HttpHeaders.cookieHeader: cookieHeader},
+      );
+
+      expect(response.statusCode, 200);
+      expect(response.headers[HttpHeaders.setCookieHeader], isNull);
+    });
+  });
+}
+
+-------- [ Separator ] ------
+
+File Name: unit/router_test.dart
+Size: 1.94 KB
+Code:
+import 'package:dart_express/dart_express.dart';
+import 'package:test/test.dart';
+
+void main() {
+  group('RadixRouter matching', () {
+    late RadixRouter router;
+
+    setUp(() => router = RadixRouter());
+
+    test('matches static routes first', () {
+      final handler = (Request _, Response __) {};
+      router.addRoute('GET', '/users/list', handler);
+      router.addRoute('GET', '/users/:id', (req, res) {});
+
+      final match = router.findRoute('GET', '/users/list');
+      expect(match, isNotNull);
+      expect(match!.handler, same(handler));
+    });
+
+    test('extracts regex constrained parameters', () {
+      router.addRoute('GET', '/users/:id(\\d+)', (req, res) {});
+      final match = router.findRoute('GET', '/users/42');
+
+      expect(match, isNotNull);
+      expect(match!.pathParams['id'], '42');
+    });
+
+    test('skips non-matching regex segments', () {
+      router.addRoute('GET', '/users/:id(\\d+)', (req, res) {});
+      final match = router.findRoute('GET', '/users/abc');
+
+      expect(match, isNull);
+    });
+
+    test('supports wildcard parameters', () {
+      router.addRoute('GET', '/assets/:file', (req, res) {});
+      final match = router.findRoute('GET', '/assets/logo.png');
+
+      expect(match, isNotNull);
+      expect(match!.pathParams['file'], 'logo.png');
+    });
+
+    test('throws on conflicting handlers', () {
+      router.addRoute('GET', '/conflict', (req, res) {});
+      expect(
+        () => router.addRoute('GET', '/conflict', (req, res) {}),
+        throwsA(isA<RouteConflictError>()),
+      );
+    });
+
+    test('delegates to isolated routers at prefixes', () {
+      final isolated = RadixRouter();
+      final isolatedHandler = (Request _, Response __) {};
+      isolated.addRoute('GET', '/health', isolatedHandler);
+
+      router.addIsolatedRouter('/api', isolated);
+
+      final match = router.findRoute('GET', '/api/health');
+      expect(match, isNotNull);
+      expect(match!.handler, same(isolatedHandler));
+    });
+  });
+}
+
+-------- [ Separator ] ------

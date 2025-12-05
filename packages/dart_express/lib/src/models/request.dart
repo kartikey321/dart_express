@@ -15,6 +15,7 @@ import 'package:uuid/uuid.dart';
 /// consumed exactly once.
 class Request {
   final HttpRequest httpRequest;
+  final String requestId;
   Map<String, String> params = {};
   late final Map<String, String> query;
   final Session session;
@@ -31,6 +32,7 @@ class Request {
   Request(
     this.httpRequest,
     this.session,
+    this.requestId,
     this.container, {
     bool isSessionNew = false,
     this.maxBodySize = 10 * 1024 * 1024,
@@ -119,11 +121,15 @@ class Request {
       isSessionNew = true;
     }
 
-    final session = Session(sessionCookie!.value);
+    final session = Session(sessionCookie.value);
+    final requestId = httpRequest.headers.value('x-request-id') ??
+        httpRequest.headers.value('x-correlation-id') ??
+        _generateRequestId();
 
     return Request(
       httpRequest,
       session,
+      requestId,
       container,
       isSessionNew: isSessionNew,
       maxBodySize: maxBodySize,
@@ -133,6 +139,10 @@ class Request {
 
   /// Generate a cryptographically secure session ID using UUID v4
   static String _generateSessionId() {
+    return const Uuid().v4();
+  }
+
+  static String _generateRequestId() {
     return const Uuid().v4();
   }
 
@@ -173,17 +183,23 @@ class Request {
     final future = () async {
       final buffer = BytesBuilder();
       var totalSize = 0;
+      final iterator = StreamIterator<List<int>>(httpRequest);
 
-      await for (final chunk in httpRequest) {
-        totalSize += chunk.length;
+      try {
+        while (await iterator.moveNext()) {
+          final chunk = iterator.current;
+          totalSize += chunk.length;
 
-        if (totalSize > maxBodySize) {
-          // Drain remaining stream to prevent connection issues
-          await httpRequest.drain();
-          throw HttpError(413, 'Payload Too Large');
+          if (totalSize > maxBodySize) {
+            // Consume and discard remaining bytes to keep the socket healthy.
+            while (await iterator.moveNext()) {}
+            throw HttpError(413, 'Payload Too Large');
+          }
+
+          buffer.add(chunk);
         }
-
-        buffer.add(chunk);
+      } finally {
+        await iterator.cancel();
       }
 
       return buffer.takeBytes();
@@ -282,10 +298,11 @@ class Session {
 class _FormDataPayload {
   _FormDataPayload(
       Map<String, String> fields, Map<String, List<MultipartFile>> files)
-      : fields = Map.unmodifiable(fields),
+      : fields = Map.unmodifiable(Map<String, String>.from(fields)),
         files = Map.unmodifiable(
           files.map(
-            (key, value) => MapEntry(key, List.unmodifiable(value)),
+            (key, value) =>
+                MapEntry(key, List<MultipartFile>.unmodifiable(value)),
           ),
         );
 

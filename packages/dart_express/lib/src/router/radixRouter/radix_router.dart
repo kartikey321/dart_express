@@ -1,7 +1,6 @@
 // radix_router.dart
 import 'package:dart_express/dart_express.dart';
 import 'package:dart_express/src/router/router_interface.dart';
-import 'package:dart_express/src/services/error_handler.dart';
 
 part 'radix_node.dart';
 
@@ -21,7 +20,6 @@ class RadixRouter implements RouterInterface {
   @override
   void addRoute(String method, String path, RequestHandler handler) {
     final normalizedPath = _normalizePath(path);
-    final routeKey = '$method:$normalizedPath';
 
     final segments = _splitPath(normalizedPath);
     var currentNode = _root;

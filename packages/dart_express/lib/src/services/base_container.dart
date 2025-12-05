@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:dart_express/dart_express.dart';
 import 'package:get_it/get_it.dart';
 import 'package:meta/meta.dart';
+import 'package:logger/logger.dart';
 
 import '../router/router_interface.dart';
-import 'error_handler.dart';
 
 /// Core runtime wiring shared by [DartExpress] and other container variants.
 /// Provides middleware composition, dependency registration helpers, and
@@ -15,12 +15,15 @@ abstract class BaseContainer {
   final List<MiddlewareHandler> _middleware = [];
   final GetIt container;
   ErrorHandler? _errorHandler;
+  late final Logger logger;
 
   /// Creates a container with optional overrides for router and dependency
   /// scope.
-  BaseContainer({RouterInterface? router, GetIt? container})
+  BaseContainer({RouterInterface? router, GetIt? container, Logger? logger})
       : router = router ?? RadixRouter(),
-        container = container ?? GetIt.instance;
+        container = container ?? GetIt.instance {
+    this.logger = logger ?? _defaultLogger();
+  }
 
   /// Adds a global [middleware] to the container.
   void use(MiddlewareHandler middleware) {
@@ -134,6 +137,9 @@ abstract class BaseContainer {
       );
     }
 
+    // Attach request correlation id to response for tracing
+    response.setHeader('X-Request-Id', request.requestId);
+
     try {
       final resolvedPath = resolveRoutePath(request);
       final routeMatch = router.findRoute(request.method, resolvedPath);
@@ -167,11 +173,13 @@ abstract class BaseContainer {
         await _errorHandler!(error, request, response);
         // Ensure error handler actually sent a response
         if (!response.isSent) {
-          print('Warning: Error handler did not send response, using fallback');
+          logger.w(
+              'Error handler did not send response, using fallback for ${request.method} ${request.uri.path}');
           _sendDefaultError(error, response, stackTrace);
         }
       } catch (e, st) {
-        print('Error in error handler: $e\n$st');
+        logger.e('Error in error handler for ${request.method} ${request.uri.path}',
+            error: e, stackTrace: st);
         // Fall through to default error handling
         if (!response.isSent) {
           _sendDefaultError(error, response, stackTrace);
@@ -186,7 +194,7 @@ abstract class BaseContainer {
       dynamic error, Response response, StackTrace stackTrace) {
     if (response.isSent) return;
 
-    print('Unhandled error: $error\nStackTrace: $stackTrace');
+    logger.e('Unhandled error', error: error, stackTrace: stackTrace);
     if (error is HttpError) {
       response.setStatus(error.statusCode);
       response.json({'error': error.message, 'data': error.data});
@@ -200,5 +208,17 @@ abstract class BaseContainer {
   /// Disposes the dependency container and any subclass resources.
   Future<void> onDispose() async {
     container.reset();
+  }
+
+  static Logger _defaultLogger() {
+    return Logger(
+      printer: PrettyPrinter(
+        methodCount: 0,
+        errorMethodCount: 5,
+        lineLength: 120,
+        printEmojis: false,
+        dateTimeFormat: DateTimeFormat.none,
+      ),
+    );
   }
 }

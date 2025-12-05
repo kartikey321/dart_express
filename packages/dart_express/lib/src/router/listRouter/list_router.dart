@@ -2,8 +2,6 @@
 import 'package:dart_express/dart_express.dart';
 import 'package:dart_express/src/router/router_interface.dart';
 
-import '../../services/error_handler.dart';
-
 part 'route_entry.dart';
 
 class ListRouter implements RouterInterface {

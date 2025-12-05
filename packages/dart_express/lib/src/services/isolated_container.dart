@@ -80,7 +80,7 @@ class IsolatedContainer extends BaseContainer {
   Future<void> listen(int port, {InternetAddress? address}) async {
     address ??= InternetAddress.anyIPv4;
     final server = await HttpServer.bind(address, port);
-    print('Isolated container listening on port ${server.port}');
+    logger.i('Isolated container listening on port ${server.port}');
     await for (final httpRequest in server) {
       await handleRequest(httpRequest);
     }
@@ -109,6 +109,11 @@ class IsolatedContainer extends BaseContainer {
   Future<void> onDispose() {
     cache.clear();
     return super.onDispose();
+  }
+
+  /// Public hook to process a scoped request inside this container.
+  Future<void> handleScoped(Request request, Response response) {
+    return processRequest(request, response);
   }
 
   static String _normalizeLocalPath(String path) {
@@ -160,7 +165,7 @@ class _IsolatedRouterDelegate implements RouterInterface {
           container: container.container,
         );
 
-        await container.processRequest(scopedRequest, parentResponse);
+        await container.handleScoped(scopedRequest, parentResponse);
       },
       pathParams: delegateMatch.pathParams,
     );

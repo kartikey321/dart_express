@@ -23,7 +23,8 @@ Future<void> _startWorker(List<dynamic> params) async {
     res.json({'status': 'ok', 'requestId': req.requestId});
   });
   app.enableHealthCheck();
-
+  print('address: ${InternetAddress.loopbackIPv4}');
+  print('port: $port');
   await app.listen(
     port,
     address: InternetAddress.loopbackIPv4,

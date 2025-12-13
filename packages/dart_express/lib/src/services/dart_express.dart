@@ -28,6 +28,10 @@ class DartExpress extends BaseContainer {
   final int maxFileSize;
   final Duration requestTimeout;
   final Duration shutdownTimeout;
+  final String? sessionSecret;
+  final SessionStore? sessionStore;
+  final SessionSigner? _sessionSigner;
+  final List<MemoryRateLimitStore> _rateLimitStores = [];
   int _activeRequests = 0;
   bool _isShuttingDown = false;
   final DateTime _startTime = DateTime.now();
@@ -38,10 +42,20 @@ class DartExpress extends BaseContainer {
     this.maxFileSize = 100 * 1024 * 1024, // 100MB
     this.requestTimeout = const Duration(seconds: 30),
     this.shutdownTimeout = const Duration(seconds: 30),
+    this.sessionSecret,
+    this.sessionStore,
+    bool secureCookies = true,
     Logger? logger,
     RouterInterface? router,
     GetIt? container,
-  }) : super(container: container, router: router, logger: logger) {
+  })  : _sessionSigner =
+            sessionSecret != null ? SessionSigner(sessionSecret) : null,
+        super(
+          container: container,
+          router: router,
+          logger: logger,
+          secureCookies: secureCookies,
+        ) {
     _validateConfig();
     if (useCookieParser) {
       use(CookieParser.middleware());
@@ -105,6 +119,8 @@ class DartExpress extends BaseContainer {
       container: container,
       maxBodySize: maxBodySize,
       maxFileSize: maxFileSize,
+      sessionSigner: _sessionSigner,
+      sessionStore: sessionStore,
     );
     final response = Response();
     await processRequest(request, response);
@@ -187,9 +203,13 @@ class DartExpress extends BaseContainer {
 
         // Handle preflight OPTIONS request
         if (method == 'OPTIONS') {
-          response.setHeader('Vary',
-              response.headers['Vary'] == null ? 'Origin' : response.headers['Vary']!);
-          response.setHeader('Access-Control-Allow-Headers',
+          response.setHeader(
+              'Vary',
+              response.headers['Vary'] == null
+                  ? 'Origin'
+                  : response.headers['Vary']!);
+          response.setHeader(
+              'Access-Control-Allow-Headers',
               request.headers.value('access-control-request-headers') ??
                   allowedHeaders.join(', '));
           response.setStatus(HttpStatus.noContent); // 204 No Content
@@ -232,6 +252,12 @@ class DartExpress extends BaseContainer {
     RateLimitStore? store,
   }) {
     final effectiveStore = store ?? MemoryRateLimitStore();
+
+    // Track memory stores for cleanup
+    if (effectiveStore is MemoryRateLimitStore && store == null) {
+      _rateLimitStores.add(effectiveStore);
+    }
+
     return (request, response, next) async {
       final key = keyGenerator != null
           ? keyGenerator(request)
@@ -302,6 +328,25 @@ class DartExpress extends BaseContainer {
         unawaited(_handleRequestWithTimeout(httpRequest));
       }
     } finally {
+      // Clean up rate limiter stores
+      for (final store in _rateLimitStores) {
+        try {
+          store.dispose();
+        } catch (e, stack) {
+          logger.e('Error disposing rate limiter store',
+              error: e, stackTrace: stack);
+        }
+      }
+
+      // Clean up session store resources
+      if (sessionStore != null) {
+        try {
+          await sessionStore!.dispose();
+        } catch (e, stack) {
+          logger.e('Error disposing session store',
+              error: e, stackTrace: stack);
+        }
+      }
       await onDispose();
     }
   }
@@ -336,9 +381,12 @@ class DartExpress extends BaseContainer {
     dynamic error,
     StackTrace stackTrace,
   ) async {
-    logger.e('Request error ${httpRequest.method} ${httpRequest.uri.path} '
+    logger.e(
+        'Request error ${httpRequest.method} ${httpRequest.uri.path} '
         'reqId=${httpRequest.headers.value('x-request-id') ?? '-'}',
-        error: error, stackTrace: stackTrace, time: DateTime.now());
+        error: error,
+        stackTrace: stackTrace,
+        time: DateTime.now());
     try {
       final statusCode = error is HttpError ? error.statusCode : 500;
 
@@ -377,6 +425,16 @@ class DartExpress extends BaseContainer {
     if (maxFileSize > maxBodySize) {
       logger.w(
           'maxFileSize ($maxFileSize) is greater than maxBodySize ($maxBodySize); large uploads may hit body limit first.');
+    }
+    if (secureCookies && sessionSecret == null) {
+      logger.w(
+          'secureCookies is enabled but no sessionSecret provided. Session cookies will not be signed. '
+          'Set sessionSecret for production security.');
+    }
+    if (sessionStore == null) {
+      logger.w('No session store provided. Using in-memory sessions. '
+          'Sessions will be lost on restart and will NOT work with multiple instances. '
+          'Set sessionStore to a persistent store (e.g., Redis) for production.');
     }
   }
 }

@@ -22,6 +22,7 @@ class Request {
   final GetIt container;
   final int maxBodySize;
   final int maxFileSize;
+  final SessionSigner? sessionSigner;
   Object? _parsedBody;
   Future<Uint8List>? _bodyBytesFuture;
   _FormDataPayload? _multipartPayload;
@@ -37,6 +38,7 @@ class Request {
     bool isSessionNew = false,
     this.maxBodySize = 10 * 1024 * 1024,
     this.maxFileSize = 100 * 1024 * 1024,
+    this.sessionSigner,
   }) : _isSessionNew = isSessionNew {
     query = httpRequest.uri.queryParameters;
   }
@@ -104,24 +106,46 @@ class Request {
 
   /// Creates a request wrapper, bootstrapping session state from the incoming
   /// cookie (or generating a new session identifier when absent).
+  ///
+  /// If [sessionSigner] is provided, session cookies will be verified using
+  /// HMAC-SHA256. Invalid signatures will be treated as if no session exists.
   factory Request.from(
     HttpRequest httpRequest, {
     required GetIt container,
     int maxBodySize = 10 * 1024 * 1024,
     int maxFileSize = 100 * 1024 * 1024,
+    SessionSigner? sessionSigner,
+    SessionStore? sessionStore,
   }) {
     Cookie? sessionCookie;
     bool isSessionNew = false;
+    String sessionId;
 
     try {
       sessionCookie = httpRequest.cookies
           .firstWhere((cookie) => cookie.name == _sessionCookieName);
+
+      // Verify signed session cookie if signer is available
+      if (sessionSigner != null) {
+        final verifiedId = sessionSigner.verify(sessionCookie.value);
+        if (verifiedId != null) {
+          sessionId = verifiedId;
+        } else {
+          // Invalid signature - generate new session
+          sessionId = _generateSessionId();
+          isSessionNew = true;
+        }
+      } else {
+        // No signing - use cookie value as-is
+        sessionId = sessionCookie.value;
+      }
     } on StateError {
-      sessionCookie = Cookie(_sessionCookieName, _generateSessionId());
+      // No session cookie found - create new session
+      sessionId = _generateSessionId();
       isSessionNew = true;
     }
 
-    final session = Session(sessionCookie.value);
+    final session = Session(sessionId, store: sessionStore);
     final requestId = httpRequest.headers.value('x-request-id') ??
         httpRequest.headers.value('x-correlation-id') ??
         _generateRequestId();
@@ -134,6 +158,7 @@ class Request {
       isSessionNew: isSessionNew,
       maxBodySize: maxBodySize,
       maxFileSize: maxFileSize,
+      sessionSigner: sessionSigner,
     );
   }
 
@@ -255,8 +280,8 @@ class Request {
       if (filenameMatch != null) {
         // This is a file upload - check file size limit
         final filename = filenameMatch.group(1)!;
-        final bytes =
-            Uint8List.fromList(await consolidateBytes(part, sizeLimit: maxFileSize));
+        final bytes = Uint8List.fromList(
+            await consolidateBytes(part, sizeLimit: maxFileSize));
 
         final filesForField =
             fileData.putIfAbsent(name, () => <MultipartFile>[]);
@@ -288,11 +313,111 @@ class Request {
   static const String sessionCookieName = _sessionCookieName;
 }
 
+/// Represents a user session with optional persistent storage.
+///
+/// Sessions can be backed by a [SessionStore] for persistence across
+/// server restarts and multi-instance deployments.
+///
+/// ## Usage
+/// ```dart
+/// // Access session data
+/// final userId = req.session['userId'];
+///
+/// // Set session data
+/// req.session['userId'] = '123';
+/// req.session['username'] = 'john';
+///
+/// // Session is automatically saved after request completes
+/// ```
 class Session {
   final String id;
-  final Map<String, dynamic> data = {};
+  final SessionStore? _store;
+  Map<String, dynamic> _data = {};
+  bool _isDirty = false;
+  bool _isLoaded = false;
 
-  Session(this.id);
+  Session(this.id, {SessionStore? store}) : _store = store {
+    // If no store, mark as loaded since there's nothing to load
+    if (store == null) {
+      _isLoaded = true;
+    }
+  }
+
+  /// Gets a value from the session.
+  dynamic operator [](String key) => _data[key];
+
+  /// Sets a value in the session and marks it as dirty.
+  void operator []=(String key, dynamic value) {
+    _data[key] = value;
+    _isDirty = true;
+  }
+
+  /// Removes a key from the session.
+  void remove(String key) {
+    _data.remove(key);
+    _isDirty = true;
+  }
+
+  /// Clears all session data.
+  void clear() {
+    _data.clear();
+    _isDirty = true;
+  }
+
+  /// Returns an unmodifiable view of session data.
+  Map<String, dynamic> get data => Map.unmodifiable(_data);
+
+  /// Whether this session has unsaved changes.
+  bool get isDirty => _isDirty;
+
+  /// Loads session data from the store.
+  ///
+  /// This is automatically called when a request is processed.
+  /// You rarely need to call this manually.
+  Future<void> load() async {
+    if (_store != null && !_isLoaded) {
+      final loadedData = await _store.load(id);
+      _data = loadedData ?? {};
+      _isLoaded = true;
+      _isDirty = false;
+    }
+  }
+
+  /// Saves session data to the store if it has been modified.
+  ///
+  /// This is automatically called after a request completes.
+  /// You can call it manually if you need to ensure data is persisted.
+  ///
+  /// Parameters:
+  /// - [ttl]: Optional time-to-live for the session
+  Future<void> save({Duration? ttl}) async {
+    if (_store != null && _isDirty) {
+      await _store.save(id, _data, ttl: ttl);
+      _isDirty = false;
+    }
+  }
+
+  /// Destroys this session, removing all data from the store.
+  ///
+  /// After calling this, the session ID becomes invalid and a new
+  /// session will be created on the next request.
+  Future<void> destroy() async {
+    if (_store != null) {
+      await _store.destroy(id);
+    }
+    _data.clear();
+    _isDirty = false;
+  }
+
+  // Removed regenerate() method - session ID is final and can't be changed.
+  // To regenerate session for security (e.g., after login), create a new
+  // session by destroying the current one and letting the framework create
+  // a new one on the next request.
+  //
+  // Example:
+  //   await req.session.destroy();
+  //   res.clearCookie(Request.sessionCookieName);
+  //   // Next request will get a new session
 }
 
 class _FormDataPayload {

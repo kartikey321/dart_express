@@ -14,13 +14,18 @@ abstract class BaseContainer {
   final RouterInterface router;
   final List<MiddlewareHandler> _middleware = [];
   final GetIt container;
+  final bool secureCookies;
   ErrorHandler? _errorHandler;
   late final Logger logger;
 
   /// Creates a container with optional overrides for router and dependency
   /// scope.
-  BaseContainer({RouterInterface? router, GetIt? container, Logger? logger})
-      : router = router ?? RadixRouter(),
+  BaseContainer({
+    RouterInterface? router,
+    GetIt? container,
+    Logger? logger,
+    this.secureCookies = true,
+  })  : router = router ?? RadixRouter(),
         container = container ?? GetIt.instance {
     this.logger = logger ?? _defaultLogger();
   }
@@ -127,13 +132,30 @@ abstract class BaseContainer {
   /// [response]. If a route does not complete the response, it is sent here.
   @protected
   Future<void> processRequest(Request request, Response response) async {
+    // Load session data from store (with error handling)
+    try {
+      await request.session.load();
+    } catch (e, stack) {
+      logger.e('Failed to load session', error: e, stackTrace: stack);
+      // Continue with empty session rather than crashing request
+    }
+
+    // Set up session cookie for new sessions
     if (request.isNewSession &&
         !response.hasCookie(Request.sessionCookieName)) {
+      // Determine session cookie value (signed or plain)
+      String cookieValue = request.session.id;
+      if (request.sessionSigner != null) {
+        cookieValue = request.sessionSigner!.sign(request.session.id);
+      }
+
+      // Set session cookie with configured security settings
       response.cookie(
         Request.sessionCookieName,
-        request.session.id,
-        secure: false,
+        cookieValue,
+        secure: secureCookies,
         httpOnly: true,
+        sameSite: SameSite.lax,
       );
     }
 
@@ -151,6 +173,14 @@ abstract class BaseContainer {
       }
     } catch (error, stackTrace) {
       await handleError(error, request, response, stackTrace);
+    }
+
+    // Save session data to store if modified (with error handling)
+    try {
+      await request.session.save();
+    } catch (e, stack) {
+      logger.e('Failed to save session', error: e, stackTrace: stack);
+      // Log error but don't fail the request
     }
 
     if (!response.isSent) {
@@ -178,8 +208,10 @@ abstract class BaseContainer {
           _sendDefaultError(error, response, stackTrace);
         }
       } catch (e, st) {
-        logger.e('Error in error handler for ${request.method} ${request.uri.path}',
-            error: e, stackTrace: st);
+        logger.e(
+            'Error in error handler for ${request.method} ${request.uri.path}',
+            error: e,
+            stackTrace: st);
         // Fall through to default error handling
         if (!response.isSent) {
           _sendDefaultError(error, response, stackTrace);

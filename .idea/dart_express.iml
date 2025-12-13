@@ -15,6 +15,33 @@
       <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/web/dart/dart-express-aot-3.6/.dart_tool" />
       <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/web/dart/dart-express-aot-3.6/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/web/dart/dart-express-aot-3.6/build" />
+      <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/computation/dart/_common/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/computation/dart/_common/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/computation/dart/_common/build" />
+      <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/web/dart/arcade-1-aot-3.9/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/web/dart/arcade-1-aot-3.9/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/web/dart/arcade-1-aot-3.9/build" />
+      <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/web/dart/dartfrog-1-aot-3.2/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/web/dart/dartfrog-1-aot-3.2/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/web/dart/dartfrog-1-aot-3.2/build" />
+      <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/web/dart/httpserver-aot-2.14/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/web/dart/httpserver-aot-2.14/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/web/dart/httpserver-aot-2.14/build" />
+      <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/web/dart/pharaoh-0.0.7-aot-3.0/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/web/dart/pharaoh-0.0.7-aot-3.0/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/web/dart/pharaoh-0.0.7-aot-3.0/build" />
+      <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/web/dart/serinus-0.4-aot-3.3/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/web/dart/serinus-0.4-aot-3.3/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/web/dart/serinus-0.4-aot-3.3/build" />
+      <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/web/dart/serverpod-2-aot-3.3/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/web/dart/serverpod-2-aot-3.3/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/web/dart/serverpod-2-aot-3.3/build" />
+      <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/web/dart/shelf-1-aot-2.14/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/web/dart/shelf-1-aot-2.14/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/web/dart/shelf-1-aot-2.14/build" />
+      <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/web/dart/vania-0.3-aot-3.4/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/web/dart/vania-0.3-aot-3.4/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/test/sharkbench/benchmark/web/dart/vania-0.3-aot-3.4/build" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

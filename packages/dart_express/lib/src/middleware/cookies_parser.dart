@@ -5,7 +5,7 @@ import 'package:dart_express/dart_express.dart';
 class CookieParser {
   static MiddlewareHandler middleware({
     bool decodeValues = true,
-    bool allowEmptyValues = false,
+    bool allowEmptyValues = true, // Allow empty values (e.g., logout=, flag=)
   }) {
     return (Request req, Response res, NextFunction next) async {
       try {

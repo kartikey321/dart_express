@@ -151,16 +151,11 @@ class DartExpress extends BaseContainer {
     this.shutdownTimeout = const Duration(seconds: 30),
     this.sessionSecret,
     SessionStore? sessionStore,
-    bool secureCookies = true,
-    Logger? logger,
-    RouterInterface? router,
-    GetIt? container,
+    super.secureCookies,
+    super.logger,
+    super.router,
+    super.container,
   }) : super(
-          container: container,
-          router: router,
-          logger: logger,
-          secureCookies: secureCookies,
-          // Default to MemorySessionStore if not provided
           sessionStore: sessionStore ?? MemorySessionStore(),
           sessionSigner:
               sessionSecret != null ? SessionSigner(sessionSecret) : null,

@@ -1,0 +1,254 @@
+# Middleware
+
+Middleware functions are the building blocks of dart_express applications. They process requests, modify responses, and control the flow of execution.
+
+## What is Middleware?
+
+Middleware is a function that has access to the request object (`req`), response object (`res`), and the next middleware function (`next`).
+
+```dart
+Future<void> myMiddleware(Request req, Response res, NextFunction next) async {
+  // Do something before the route handler
+  print('Request received');
+  
+  // Pass control to the next middleware
+  await next();
+  
+  // Do something after the route handler
+  print('Response sent');
+}
+```
+
+## Using Middleware
+
+### Global Middleware
+
+Applies to all routes:
+
+```dart
+final app = DartExpress();
+
+// Logging middleware
+app.use((req, res, next) async {
+  print('[${DateTime.now()}] ${req.method} ${req.uri.path}');
+  await next();
+});
+
+// Your routes
+app.get('/', (req, res) => res.text('Hello!'));
+```
+
+### Route-Specific Middleware
+
+Apply to specific routes:
+
+```dart
+Future<void> authMiddleware(Request req, Response res, NextFunction next) async {
+  final token = req.headers['authorization'];
+  
+  if (token == null) {
+    return res.status(401).json({'error': 'Unauthorized'});
+  }
+  
+  // Verify token...
+  await next();
+}
+
+app.get('/protected', authMiddleware, (req, res) {
+  res.json({'message': 'Secret data'});
+});
+```
+
+## Built-in Middleware
+
+### CORS
+
+Enable Cross-Origin Resource Sharing:
+
+```dart
+app.use(app.cors(
+  allowedOrigins: ['https://example.com'],
+  allowedMethods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+));
+```
+
+### Rate Limiting
+
+Protect against abuse:
+
+```dart
+app.use(app.rateLimit(
+  maxRequests: 100,
+  windowMs: 60000, // 1 minute
+));
+```
+
+## Middleware Patterns
+
+### Authentication
+
+```dart
+Future<void> requireAuth(Request req, Response res, NextFunction next) async {
+  if (!req.session.containsKey('userId')) {
+    return res.status(401).json({'error': 'Please log in'});
+  }
+  await next();
+}
+
+app.get('/profile', requireAuth, (req, res) {
+  final userId = req.session['userId'];
+  res.json({'userId': userId});
+});
+```
+
+### Request Validation
+
+```dart
+Future<void> validateUser(Request req, Response res, NextFunction next) async {
+  final body = await req.body;
+  
+  if (body['email'] == null || body['password'] == null) {
+    return res.status(400).json({
+      'error': 'Email and password required'
+    });
+  }
+  
+  await next();
+}
+
+app.post('/signup', validateUser, (req, res) async {
+  final body = await req.body;
+  // Create user...
+});
+```
+
+### Error Handling
+
+```dart
+app.use((req, res, next) async {
+  try {
+    await next();
+  } catch (e, stack) {
+    print('Error: $e');
+    print(stack);
+    res.status(500).json({
+      'error': 'Internal server error',
+      'message': e.toString(),
+    });
+  }
+});
+```
+
+### Request Timing
+
+```dart
+app.use((req, res, next) async {
+  final start = DateTime.now();
+  
+  await next();
+  
+  final duration = DateTime.now().difference(start);
+  print('${req.method} ${req.uri.path} - ${duration.inMilliseconds}ms');
+});
+```
+
+## Middleware Order
+
+Middleware executes in the order it's defined:
+
+```dart
+// 1. Logging
+app.use((req, res, next) async {
+  print('1: Before');
+  await next();
+  print('1: After');
+});
+
+// 2. Auth check
+app.use((req, res, next) async {
+  print('2: Before');
+  await next();
+  print('2: After');
+});
+
+// 3. Route handler
+app.get('/', (req, res) {
+  print('3: Handler');
+  res.text('Hello!');
+});
+```
+
+Output:
+```
+1: Before
+2: Before
+3: Handler
+2: After  
+1: After
+```
+
+## Stopping the Chain
+
+Don't call `next()` to stop:
+
+```dart
+app.use((req, res, next) async {
+  if (req.headers['api-key'] != 'secret') {
+    return res.status(403).json({'error': 'Forbidden'});
+    // next() NOT called - stops here
+  }
+  await next();
+});
+```
+
+## Modifying Request/Response
+
+Middleware can modify the request/response objects:
+
+```dart
+app.use((req, res, next) async {
+  // Add custom data to request
+  req.session['timestamp'] = DateTime.now().toIso8601String();
+  
+  // Add custom headers to response
+  res.setHeader('X-Powered-By', 'dart_express');
+  
+  await next();
+});
+```
+
+## Third-Party Middleware
+
+Create reusable middleware packages:
+
+```dart
+// my_logger_middleware.dart
+Future<void> loggerMiddleware({
+  bool showTimestamp = true,
+}) {
+  return (Request req, Response res, NextFunction next) async {
+    final time = showTimestamp ? '[${DateTime.now()}] ' : '';
+    print('$time${req.method} ${req.uri.path}');
+    await next();
+  };
+}
+
+// Usage
+app.use(loggerMiddleware(showTimestamp: true));
+```
+
+## Best Practices
+
+1. **Keep middleware focused** - Each middleware should do one thing well
+2. **Always call next()** - Unless you're terminating the request
+3. **Error handling** - Wrap route handlers in try-catch middleware
+4. **Order matters** - Put logging first, error handling last
+5. **Async/await** - Always use async and await next()
+
+## Next Steps
+
+- [Error Handling](/core-concepts/error-handling) - Handle errors gracefully
+- [Sessions](/core-concepts/sessions) - Manage user sessions
+- [Security](/security/cors) - Secure your application

@@ -2,6 +2,16 @@
 
 Performance benchmarking tools for the dart_express framework.
 
+## Quick Start
+
+```bash
+# Terminal 1: Start test server
+dart run bin/test_server.dart
+
+# Terminal 2: Run load test
+dart run bin/load_test.dart http://localhost:3000 1000 10
+```
+
 ## Tools
 
 ### 1. Framework Benchmarks (`run_benchmarks.dart`)

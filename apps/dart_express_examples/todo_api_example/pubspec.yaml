@@ -1,0 +1,15 @@
+name: todo_api_example
+description: Production REST API example with dart_express
+version: 1.0.0
+
+environment:
+  sdk: ^3.6.0
+
+dependencies:
+  dart_express:
+    path: ../../../packages/dart_express
+  uuid: ^4.0.0
+
+dev_dependencies:
+  lints: ^5.0.0
+  test: ^1.24.0

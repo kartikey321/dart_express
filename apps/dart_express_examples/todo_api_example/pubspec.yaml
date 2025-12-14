@@ -1,6 +1,7 @@
 name: todo_api_example
 description: Production REST API example with dart_express
 version: 1.0.0
+publish_to: none # Not for publishing, example only
 
 environment:
   sdk: ^3.6.0

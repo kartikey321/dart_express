@@ -1,6 +1,7 @@
 name: session_security_example
 description: Production-ready session security example with dart_express
 version: 1.0.0
+publish_to: none # Not for publishing, example only
 
 environment:
   sdk: ^3.6.0

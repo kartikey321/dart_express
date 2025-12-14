@@ -44,7 +44,14 @@ void main() async {
 
   // POST /todos - Create
   app.post('/todos', (req, res) async {
-    final body = await req.json();
+    final body = await req.body;
+
+    if (body == null || body is! Map) {
+      return res.json(
+        {'error': 'Invalid request body'},
+        statusCode: 400,
+      );
+    }
 
     if (body['title'] == null || body['title'].toString().trim().isEmpty) {
       return res.json(
@@ -85,7 +92,14 @@ void main() async {
       return res.json({'error': 'Todo not found'}, statusCode: 404);
     }
 
-    final body = await req.json();
+    final body = await req.body;
+
+    if (body == null || body is! Map) {
+      return res.json(
+        {'error': 'Invalid request body'},
+        statusCode: 400,
+      );
+    }
 
     final updated = Todo(
       id: todo.id,

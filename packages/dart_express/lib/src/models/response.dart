@@ -5,16 +5,43 @@ import 'dart:typed_data';
 
 import 'package:mime/mime.dart';
 
-/// Represents an outgoing HTTP response with helpers for composing common
-/// payload types and managing headers/cookies before the underlying
-/// [HttpResponse] is closed.
+/// Represents an outgoing HTTP response with helpers for common response types.
+///
+/// Response objects are passed to route handlers alongside [Request] objects.
+/// Use the various helper methods to send different types of responses.
+///
+/// ## Example
+///
+/// ```dart
+/// app.get('/api/user', (req, res) {
+///   res.json({'name': 'Alice'}); // JSON response
+/// });
+///
+/// app.get('/page', (req, res) {
+///   res.html('<h1>Hello</h1>'); // HTML response
+/// });
+///
+/// app.get('/download', (req, res) async {
+///   await res.file(File('data.pdf')); // File download
+/// });
+/// ```
 class Response {
+  /// HTTP status code (default: 200).
   int statusCode;
+
+  /// Response body content.
   dynamic body;
+
+  /// Response headers as key-value pairs.
   Map<String, String> headers = {};
+
+  /// Whether the response body is binary data.
   bool isBinary = false;
+
   bool _isSent = false;
   final List<Cookie> _cookies = [];
+
+  /// Whether the response has been sent to the client.
   bool get isSent => _isSent;
 
   Response({this.statusCode = 200, this.body, Map<String, String>? headers}) {
@@ -23,8 +50,31 @@ class Response {
     }
   }
 
-  /// Adds or replaces a cookie on the response. Existing cookies with the same
-  /// name and path are overwritten to avoid duplicate `Set-Cookie` headers.
+  /// Sets a cookie on the response.
+  ///
+  /// Cookies with the same [name] and [path] are replaced to avoid duplicates.
+  ///
+  /// ## Parameters
+  ///
+  /// - [name]: Cookie name
+  /// - [value]: Cookie value
+  /// - [expires]: Expiration date (absolute)
+  /// - [maxAge]: Expiration in seconds (relative)
+  /// - [domain]: Cookie domain
+  /// - [path]: Cookie path (default: '/')
+  /// - [secure]: HTTPS only (default: true)
+  /// - [httpOnly]: No JavaScript access (default: true)
+  /// - [sameSite]: CSRF protection (default: Lax)
+  ///
+  /// ## Example
+  ///
+  /// ```dart
+  /// res.cookie('sessionId', 'abc123',
+  ///   maxAge: 3600,
+  ///   httpOnly: true,
+  ///   secure: true,
+  /// );
+  /// ```
   void cookie(
     String name,
     String value, {
@@ -51,7 +101,15 @@ class Response {
     _replaceCookie(cookie);
   }
 
-  /// Removes a cookie by setting an expired value for the provided name.
+  /// Removes a cookie by name.
+  ///
+  /// Sets an expired cookie to delete it from the client.
+  ///
+  /// ## Example
+  ///
+  /// ```dart
+  /// res.clearCookie('sessionId');
+  /// ```
   void clearCookie(String name, {String? path, String? domain}) {
     final cookie = Cookie(name, '')
       ..maxAge = 0
@@ -71,7 +129,16 @@ class Response {
     });
   }
 
-  /// Serialises a JSON payload and updates the response metadata accordingly.
+  /// Sends a JSON response.
+  ///
+  /// Automatically sets Content-Type to application/json.
+  ///
+  /// ## Example
+  ///
+  /// ```dart
+  /// res.json({'success': true, 'data': users});
+  /// res.json({'error': 'Not found'}, statusCode: 404);
+  /// ```
   void json(Map<String, dynamic> data, {int? statusCode}) {
     body = jsonEncode(data);
     headers['Content-Type'] = ContentType.json.mimeType;

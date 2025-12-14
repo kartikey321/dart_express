@@ -8,26 +8,77 @@ import 'package:get_it/get_it.dart';
 import 'package:mime/mime.dart';
 import 'package:uuid/uuid.dart';
 
-/// Represents an incoming HTTP request flowing through the framework.
+/// Represents an incoming HTTP request with convenient accessors for
+/// common data like headers, query parameters, request body, and session.
 ///
-/// Exposes helpers for accessing parsed payloads, form data, uploaded files
-/// and dependency-injected services while ensuring the underlying stream is
-/// consumed exactly once.
+/// Request objects are created by the framework and passed to route handlers.
+/// The request body stream can only be consumed once, so repeated reads of
+/// [body] or [formData] will return the cached value.
+///
+/// ## Example
+///
+/// ```dart
+/// app.post('/users', (req, res) async {
+///   // Access path parameters
+///   final id = req.params['id'];
+///
+///   // Access query parameters
+///   final filter = req.query['filter'];
+///
+///  // Access request body
+///   final data = await req.body;
+///
+///   // Access session
+///   req.session['userId'] = id;
+/// });
+/// ```
 class Request {
+  /// The underlying Dart HttpRequest.
   final HttpRequest httpRequest;
+
+  /// Unique identifier for this request (UUID v4).
   final String requestId;
+
+  /// Path parameters extracted from the route pattern.
+  ///
+  /// For route `/users/:id`, accessing `/users/123` gives `params['id'] == '123'`.
   Map<String, String> params = {};
+
+  /// Query parameters from the URL.
+  ///
+  /// For URL `/search?q=dart&page=2`:
+  /// - `query['q']` returns `'dart'`
+  /// - `query['page']` returns `'2'`
   late final Map<String, String> query;
+
+  /// Session for this request.
+  ///
+  /// Access session data with:
+  /// ```dart
+  /// req.session['key'] = 'value';
+  /// final value = req.session['key'];
+  /// ```
   final Session session;
+
+  /// Dependency injection container for this request.
   final GetIt container;
+
+  /// Maximum allowed request body size in bytes (default: 10MB).
   final int maxBodySize;
+
+  /// Maximum allowed file upload size in bytes (default: 100MB).
   final int maxFileSize;
+
+  /// Session signer for verifying cookie signatures.
   final SessionSigner? sessionSigner;
+
   Object? _parsedBody;
   Future<Uint8List>? _bodyBytesFuture;
   _FormDataPayload? _multipartPayload;
   Map<String, dynamic>? _formDataCache;
   final bool _isSessionNew;
+
+  /// Parsed cookies from the Cookie header.
   List<Cookie> cookies = [];
 
   Request(
@@ -43,16 +94,39 @@ class Request {
     query = httpRequest.uri.queryParameters;
   }
 
+  /// HTTP method (GET, POST, PUT, DELETE, etc.).
   String get method => httpRequest.method;
+
+  /// Request URI with path and query parameters.
   Uri get uri => httpRequest.uri;
+
+  /// HTTP request headers.
   HttpHeaders get headers => httpRequest.headers;
 
   /// Returns the parsed request body.
   ///
-  /// * JSON payloads are decoded via `jsonDecode`
-  /// * `application/x-www-form-urlencoded` payloads return a map of fields
-  /// * Text payloads resolve to a `String`
-  /// * All other content types yield the raw `Uint8List`
+  /// Body is parsed based on Content-Type header:
+  /// - `application/json` → Decoded JSON (Map or List)
+  /// - `application/x-www-form-urlencoded` → Map<String, String>
+  /// - `text/*` → String
+  /// - Other → Uint8List (raw bytes)
+  ///
+  /// The body stream is consumed only once. Subsequent calls return cached value.
+  ///
+  /// ## Example
+  ///
+  /// ```dart
+  /// app.post('/api/data', (req, res) async {
+  ///   final body = await req.body;
+  ///
+  ///   if (body is Map) {
+  ///     final name = body['name'];
+  ///     res.json({'received': name});
+  ///   }
+  /// });
+  /// ```
+  ///
+  /// Returns `null` if body is empty.
   Future<Object?> get body async {
     if (_parsedBody != null) {
       return _parsedBody;

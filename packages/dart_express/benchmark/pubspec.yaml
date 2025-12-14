@@ -1,0 +1,16 @@
+name: dart_express_benchmark
+description: Performance benchmarks for dart_express framework
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: ^3.0.0
+
+dependencies:
+  dart_express:
+    path: ../..
+  http: ^1.1.0
+  logger: ^2.0.0
+
+dev_dependencies:
+  benchmark_harness: ^2.2.2

@@ -29,8 +29,6 @@ class DartExpress extends BaseContainer {
   final Duration requestTimeout;
   final Duration shutdownTimeout;
   final String? sessionSecret;
-  final SessionStore? sessionStore;
-  final SessionSigner? _sessionSigner;
   final List<MemoryRateLimitStore> _rateLimitStores = [];
   int _activeRequests = 0;
   bool _isShuttingDown = false;
@@ -43,18 +41,19 @@ class DartExpress extends BaseContainer {
     this.requestTimeout = const Duration(seconds: 30),
     this.shutdownTimeout = const Duration(seconds: 30),
     this.sessionSecret,
-    this.sessionStore,
+    SessionStore? sessionStore,
     bool secureCookies = true,
     Logger? logger,
     RouterInterface? router,
     GetIt? container,
-  })  : _sessionSigner =
-            sessionSecret != null ? SessionSigner(sessionSecret) : null,
-        super(
+  }) : super(
           container: container,
           router: router,
           logger: logger,
           secureCookies: secureCookies,
+          sessionStore: sessionStore,
+          sessionSigner:
+              sessionSecret != null ? SessionSigner(sessionSecret) : null,
         ) {
     _validateConfig();
     if (useCookieParser) {
@@ -119,7 +118,7 @@ class DartExpress extends BaseContainer {
       container: container,
       maxBodySize: maxBodySize,
       maxFileSize: maxFileSize,
-      sessionSigner: _sessionSigner,
+      sessionSigner: sessionSigner,
       sessionStore: sessionStore,
     );
     final response = Response();
@@ -426,15 +425,33 @@ class DartExpress extends BaseContainer {
       logger.w(
           'maxFileSize ($maxFileSize) is greater than maxBodySize ($maxBodySize); large uploads may hit body limit first.');
     }
-    if (secureCookies && sessionSecret == null) {
-      logger.w(
-          'secureCookies is enabled but no sessionSecret provided. Session cookies will not be signed. '
-          'Set sessionSecret for production security.');
+
+    if (sessionSecret != null && sessionSecret!.length < 32) {
+      throw StateError(
+          'sessionSecret must be at least 32 characters for security');
     }
+
+    if (sessionSecret != null) {
+      logger.i('✅ Session security enabled with HMAC-SHA256 signing');
+    } else {
+      logger.w(
+          '⚠️  No session secret configured - sessions will be unsigned!');
+    }
+
     if (sessionStore == null) {
-      logger.w('No session store provided. Using in-memory sessions. '
-          'Sessions will be lost on restart and will NOT work with multiple instances. '
-          'Set sessionStore to a persistent store (e.g., Redis) for production.');
+      logger.w(
+          '⚠️  Using in-memory session store - sessions will be lost on restart');
+      logger.w(
+          '   For production, configure an external store (Redis, PostgreSQL, etc.)');
+    }
+
+    if (secureCookies) {
+      logger.i('✅ Secure cookies enabled (HTTPS required)');
+      logger.i(
+          '   💡 For local HTTP development, set secureCookies: false');
+    } else {
+      logger.w('⚠️  Secure cookies DISABLED - only use in development!');
+      logger.w('   HTTPS is REQUIRED for production deployments');
     }
   }
 }

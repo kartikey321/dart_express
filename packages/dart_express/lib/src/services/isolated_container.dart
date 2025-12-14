@@ -160,11 +160,13 @@ class _IsolatedRouterDelegate implements RouterInterface {
 
     return RouteMatch(
       (parentRequest, parentResponse) async {
-        // Reuse parent session and store for isolated containers
-        // This ensures session data is shared and persisted correctly
+        // Reuse parent session and store for isolated containers.
+        // This ensures session data is shared and persisted correctly.
+        // We don't need to pass sessionStore again because we're sharing
+        // the parent Session object which already has its store reference.
         final scopedRequest = Request(
           parentRequest.httpRequest,
-          parentRequest.session, // Share session
+          parentRequest.session, // Share session (already has store)
           parentRequest.requestId,
           container.container,
           sessionSigner: parentRequest.sessionSigner,

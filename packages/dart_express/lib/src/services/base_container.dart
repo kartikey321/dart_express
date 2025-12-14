@@ -15,6 +15,8 @@ abstract class BaseContainer {
   final List<MiddlewareHandler> _middleware = [];
   final GetIt container;
   final bool secureCookies;
+  final SessionStore? sessionStore;
+  final SessionSigner? sessionSigner;
   ErrorHandler? _errorHandler;
   late final Logger logger;
 
@@ -25,6 +27,8 @@ abstract class BaseContainer {
     GetIt? container,
     Logger? logger,
     this.secureCookies = true,
+    this.sessionStore,
+    this.sessionSigner,
   })  : router = router ?? RadixRouter(),
         container = container ?? GetIt.instance {
     this.logger = logger ?? _defaultLogger();
@@ -123,7 +127,12 @@ abstract class BaseContainer {
   /// response (including error handling and session propagation).
   @protected
   Future<void> handleRequest(HttpRequest httpRequest) async {
-    final request = Request.from(httpRequest, container: container);
+    final request = Request.from(
+      httpRequest,
+      container: container,
+      sessionSigner: sessionSigner,
+      sessionStore: sessionStore,
+    );
     final response = Response();
     await processRequest(request, response);
   }
@@ -239,6 +248,8 @@ abstract class BaseContainer {
 
   /// Disposes the dependency container and any subclass resources.
   Future<void> onDispose() async {
+    // Dispose session store if provided
+    await sessionStore?.dispose();
     container.reset();
   }
 

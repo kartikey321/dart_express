@@ -8,9 +8,6 @@ environment:
 
 dependencies:
   dart_express:
-    path: ../..
+    path: ..
   http: ^1.1.0
   logger: ^2.0.0
-
-dev_dependencies:
-  benchmark_harness: ^2.2.2

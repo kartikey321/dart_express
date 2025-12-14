@@ -160,7 +160,8 @@ class DartExpress extends BaseContainer {
           router: router,
           logger: logger,
           secureCookies: secureCookies,
-          sessionStore: sessionStore,
+          // Default to MemorySessionStore if not provided
+          sessionStore: sessionStore ?? MemorySessionStore(),
           sessionSigner:
               sessionSecret != null ? SessionSigner(sessionSecret) : null,
         ) {

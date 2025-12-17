@@ -184,3 +184,10 @@ dart_express is open source software licensed under the MIT license.
 ---
 
 Ready to build something? Check out the [GitHub repo](https://github.com/kartikey321/dart_express) to get started!
+
+<div style="display:flex;justify-content:flex-start;gap:1rem;align-items:center;margin:2rem 0;">
+  <a href="/advanced/isolated-containers" style="display:flex;align-items:center;gap:0.4rem;text-decoration:none;color:inherit;">
+    <span aria-hidden="true">‹</span>
+    <span>🧱 Isolated Containers</span>
+  </a>
+</div>

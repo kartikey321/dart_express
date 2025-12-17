@@ -176,7 +176,13 @@ The radix tree router provides:
 - **Efficient matching** even with thousands of routes
 - **Zero allocations** for route matching
 
-## Next Steps
-
-- [Middleware](/core-concepts/middleware) - Add functionality to routes
-- [Request & Response](/api/request-response) - API reference
+<div style="display:flex;justify-content:space-between;gap:1rem;align-items:center;margin:2rem 0;">
+  <a href="/getting-started/quick-start" style="display:flex;align-items:center;gap:0.4rem;text-decoration:none;color:inherit;">
+    <span aria-hidden="true">‹</span>
+    <span>🚀 Quick Start</span>
+  </a>
+  <a href="/core-concepts/middleware" style="display:flex;align-items:center;gap:0.4rem;text-decoration:none;color:inherit;">
+    <span>🧩 Middleware</span>
+    <span aria-hidden="true">›</span>
+  </a>
+</div>

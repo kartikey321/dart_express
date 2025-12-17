@@ -362,8 +362,13 @@ spec:
 4. **Use multi-stage builds** to reduce attack surface
 5. **Keep base images updated**
 
-## Next Steps
-
-- [Production Setup](/deployment/production) - Production best practices
-- [Environment Variables](/deployment/environment) - Configuration guide
-- [Scaling](/deployment/scaling) - Multi-instance deployment
+<div style="display:flex;justify-content:space-between;gap:1rem;align-items:center;margin:2rem 0;">
+  <a href="/core-concepts/error-handling" style="display:flex;align-items:center;gap:0.4rem;text-decoration:none;color:inherit;">
+    <span aria-hidden="true">‹</span>
+    <span>🚧 Error Handling</span>
+  </a>
+  <a href="/examples/todo-api" style="display:flex;align-items:center;gap:0.4rem;text-decoration:none;color:inherit;">
+    <span>🗒️ TODO API</span>
+    <span aria-hidden="true">›</span>
+  </a>
+</div>

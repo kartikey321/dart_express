@@ -4,11 +4,12 @@
 /// To run code on the client, check the `main.client.dart` file.
 library;
 
+import 'dart:io';
+
 // Server-specific Jaspr import.
 import 'package:jaspr/server.dart';
 
 import 'package:jaspr_content/components/callout.dart';
-// import 'package:jaspr_content/components/code_block.dart'; // Disabled
 import 'package:jaspr_content/components/github_button.dart';
 import 'package:jaspr_content/components/header.dart';
 import 'package:jaspr_content/components/image.dart';
@@ -17,7 +18,9 @@ import 'package:jaspr_content/components/theme_toggle.dart';
 import 'package:jaspr_content/jaspr_content.dart';
 import 'package:jaspr_content/theme.dart';
 
-import 'components/clicker.dart';
+import 'components/toc_highlighter.dart';
+import 'components/safe_code_block.dart';
+import 'layouts/docs_layout_with_toc_highlighter.dart';
 
 // This file is generated automatically by Jaspr, do not remove or edit.
 import 'main.server.options.dart';
@@ -48,19 +51,23 @@ void main() {
       components: [
         // The <Info> block and other callouts.
         Callout(),
-        // Adds syntax highlighting to code blocks.
-        // CodeBlock(), // Temporarily disabled due to highlighter errors
-        // Adds a custom Jaspr component to be used as <Clicker/> in markdown.
-        CustomComponent(
-          pattern: 'Clicker',
-          builder: (_, _, _) => Clicker(),
+        // Adds syntax highlighting to code blocks with safe fallbacks.
+        SafeCodeBlock(
+          defaultLanguage: 'dart',
+          grammars: loadSafeGrammars(),
         ),
+
         // Adds zooming and caption support to images.
         Image(zoom: true),
+        // Highlights the current TOC entry while scrolling.
+        CustomComponent(
+          pattern: 'TocHighlighter',
+          builder: (_, __, ___) => const TocHighlighter(),
+        ),
       ],
       layouts: [
         // Out-of-the-box layout for documentation sites.
-        DocsLayout(
+        DocsLayoutWithTocHighlighter(
           header: Header(
             title: 'dart_express',
             logo: '',
@@ -109,6 +116,12 @@ void main() {
                 ],
               ),
               SidebarGroup(
+                title: 'Advanced',
+                links: [
+                  SidebarLink(text: "Isolated Containers", href: '/advanced/isolated-containers'),
+                ],
+              ),
+              SidebarGroup(
                 title: 'Learn More',
                 links: [
                   SidebarLink(text: "About", href: '/about'),
@@ -128,4 +141,21 @@ void main() {
       ),
     ),
   );
+}
+
+Map<String, String> loadSafeGrammars() {
+  final assetPaths = <String, String>{
+    'yaml': 'assets/grammars/yaml.json',
+    'json': 'assets/grammars/json.json',
+    'javascript': 'assets/grammars/javascript.json',
+  };
+
+  final map = <String, String>{};
+  assetPaths.forEach((lang, path) {
+    final file = File(path);
+    if (file.existsSync()) {
+      map[lang] = file.readAsStringSync();
+    }
+  });
+  return map;
 }

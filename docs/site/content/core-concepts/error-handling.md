@@ -382,8 +382,13 @@ void main() {
 }
 ```
 
-## Next Steps
-
-- [Middleware](/core-concepts/middleware) - Create error handling middleware
-- [Sessions](/core-concepts/sessions) - Handle auth errors
-- [Testing](/guides/testing) - Test error scenarios
+<div style="display:flex;justify-content:space-between;gap:1rem;align-items:center;margin:2rem 0;">
+  <a href="/core-concepts/sessions" style="display:flex;align-items:center;gap:0.4rem;text-decoration:none;color:inherit;">
+    <span aria-hidden="true">‹</span>
+    <span>🔐 Sessions</span>
+  </a>
+  <a href="/deployment/docker" style="display:flex;align-items:center;gap:0.4rem;text-decoration:none;color:inherit;">
+    <span>🐳 Docker</span>
+    <span aria-hidden="true">›</span>
+  </a>
+</div>

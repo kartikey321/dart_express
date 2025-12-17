@@ -91,11 +91,16 @@ my_api/
 └── pubspec.yaml
 ```
 
-## Next Steps
-
-- **[Quick Start](/about)** - Build a complete API
-- **[Routing](/about)** - Learn about path parameters and routing
-- **[Middleware](/about)** - Understand the middleware pipeline
+<div style="display:flex;justify-content:space-between;gap:1rem;align-items:center;margin:2rem 0;">
+  <a href="/" style="display:flex;align-items:center;gap:0.4rem;text-decoration:none;color:inherit;">
+    <span aria-hidden="true">‹</span>
+    <span>🏁 Overview</span>
+  </a>
+  <a href="/getting-started/quick-start" style="display:flex;align-items:center;gap:0.4rem;text-decoration:none;color:inherit;">
+    <span>🚀 Quick Start</span>
+    <span aria-hidden="true">›</span>
+  </a>
+</div>
 
 <Info>
 **Pro Tip**: Use `dart run --observe` to enable debugging with Dart DevTools!

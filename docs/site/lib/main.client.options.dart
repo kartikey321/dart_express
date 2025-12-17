@@ -6,6 +6,8 @@
 
 import 'package:jaspr/client.dart';
 
+import 'package:jaspr_content/components/_internal/code_block_copy_button.dart'
+    deferred as _code_block_copy_button;
 import 'package:jaspr_content/components/_internal/zoomable_image.dart'
     deferred as _zoomable_image;
 import 'package:jaspr_content/components/github_button.dart'
@@ -14,7 +16,8 @@ import 'package:jaspr_content/components/sidebar_toggle_button.dart'
     deferred as _sidebar_toggle_button;
 import 'package:jaspr_content/components/theme_toggle.dart'
     deferred as _theme_toggle;
-import 'package:site/components/clicker.dart' deferred as _clicker;
+import 'package:site/components/toc_highlighter.dart'
+    deferred as _toc_highlighter;
 
 /// Default [ClientOptions] for use with your Jaspr project.
 ///
@@ -34,6 +37,10 @@ import 'package:site/components/clicker.dart' deferred as _clicker;
 /// ```
 ClientOptions get defaultClientOptions => ClientOptions(
   clients: {
+    'jaspr_content:code_block_copy_button': ClientLoader(
+      (p) => _code_block_copy_button.CodeBlockCopyButton(),
+      loader: _code_block_copy_button.loadLibrary,
+    ),
     'jaspr_content:zoomable_image': ClientLoader(
       (p) => _zoomable_image.ZoomableImage(
         src: p['src'] as String,
@@ -54,9 +61,9 @@ ClientOptions get defaultClientOptions => ClientOptions(
       (p) => _theme_toggle.ThemeToggle(),
       loader: _theme_toggle.loadLibrary,
     ),
-    'clicker': ClientLoader(
-      (p) => _clicker.Clicker(),
-      loader: _clicker.loadLibrary,
+    'toc_highlighter': ClientLoader(
+      (p) => _toc_highlighter.TocHighlighter(),
+      loader: _toc_highlighter.loadLibrary,
     ),
   },
 );

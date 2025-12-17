@@ -222,12 +222,16 @@ await app.listen(port, host: '0.0.0.0');
 Always use environment variables for secrets in production!
 </Warning>
 
-## Next Steps
-
-- **[Routing](/about)** - Learn advanced routing patterns
-- **[Middleware](/about)** - Create custom middleware
-- **[Sessions](/about)** - Deep dive into session management
-- **[Examples](/about)** - See complete example applications
+<div style="display:flex;justify-content:space-between;gap:1rem;align-items:center;margin:2rem 0;">
+  <a href="/getting-started/installation" style="display:flex;align-items:center;gap:0.4rem;text-decoration:none;color:inherit;">
+    <span aria-hidden="true">‹</span>
+    <span>🛠️ Installation</span>
+  </a>
+  <a href="/core-concepts/routing" style="display:flex;align-items:center;gap:0.4rem;text-decoration:none;color:inherit;">
+    <span>🧭 Routing</span>
+    <span aria-hidden="true">›</span>
+  </a>
+</div>
 
 <Tip>
 Check out the TODO API example in `/apps/dart_express_examples/todo_api_example` for a complete REST API!

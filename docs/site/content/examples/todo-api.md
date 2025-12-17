@@ -298,8 +298,13 @@ cd apps/dart_express_examples/todo_api_example
 dart run bin/server.dart
 ```
 
-## Next Steps
-
-- [Session Auth Example](/examples/auth) - Add authentication
-- [MongoDB Example](/examples/mongodb) - Use real database
-- [Testing](/guides/testing) - Test your API
+<div style="display:flex;justify-content:space-between;gap:1rem;align-items:center;margin:2rem 0;">
+  <a href="/deployment/docker" style="display:flex;align-items:center;gap:0.4rem;text-decoration:none;color:inherit;">
+    <span aria-hidden="true">‹</span>
+    <span>🐳 Docker</span>
+  </a>
+  <a href="/advanced/isolated-containers" style="display:flex;align-items:center;gap:0.4rem;text-decoration:none;color:inherit;">
+    <span>🧱 Isolated Containers</span>
+    <span aria-hidden="true">›</span>
+  </a>
+</div>

@@ -388,8 +388,13 @@ app.post('/login', (req, res) async {
 });
 ```
 
-## Next Steps
-
-- [Error Handling](/core-concepts/error-handling) - Handle auth errors
-- [Middleware](/core-concepts/middleware) - Create auth middleware
-- [Examples](/examples/auth) - Complete auth example
+<div style="display:flex;justify-content:space-between;gap:1rem;align-items:center;margin:2rem 0;">
+  <a href="/core-concepts/middleware" style="display:flex;align-items:center;gap:0.4rem;text-decoration:none;color:inherit;">
+    <span aria-hidden="true">‹</span>
+    <span>🧩 Middleware</span>
+  </a>
+  <a href="/core-concepts/error-handling" style="display:flex;align-items:center;gap:0.4rem;text-decoration:none;color:inherit;">
+    <span>🚧 Error Handling</span>
+    <span aria-hidden="true">›</span>
+  </a>
+</div>

@@ -16,10 +16,10 @@ Isolated containers allow you to modularize your application by creating self-co
 Create and mount an isolated container:
 
 ```dart
-import 'package:dart_express/dart_express.dart';
+import 'package:fletch/fletch.dart';
 
 void main() async {
-  final app = DartExpress();
+  final app = Fletch();
   
   // Create isolated container for admin routes
   final admin = IsolatedContainer(prefix: '/admin');
@@ -57,7 +57,7 @@ Separate API versions with different dependencies:
 
 ```dart
 void main() async {
-  final app = DartExpress();
+  final app = Fletch();
   
   // API v1
   final v1 = IsolatedContainer(prefix: '/api/v1');
@@ -91,7 +91,7 @@ Organize app into logical services:
 
 ```dart
 void main() async {
-  final app = DartExpress();
+  final app = Fletch();
   
   // Auth service
   final auth = IsolatedContainer(prefix: '/auth');
@@ -121,7 +121,7 @@ Isolate tenant-specific logic:
 
 ```dart
 void main() async {
-  final app = DartExpress();
+  final app = Fletch();
   
   // Tenant A
   final tenantA = IsolatedContainer(prefix: '/tenant-a');
@@ -159,7 +159,7 @@ class UserService {
 }
 
 void main() async {
-  final app = DartExpress();
+  final app = Fletch();
   app.container.registerSingleton(UserService());
   
   final admin = IsolatedContainer(prefix: '/admin');
@@ -186,7 +186,7 @@ Container middleware only applies to its routes:
 
 ```dart
 void main() async {
-  final app = DartExpress();
+  final app = Fletch();
   
   // Global middleware
   app.use((req, res, next) async {
@@ -221,7 +221,7 @@ Sessions are shared between parent and isolated containers:
 
 ```dart
 void main() async {
-  final app = DartExpress(
+  final app = Fletch(
     sessionSecret: 'secret',
   );
   
@@ -309,7 +309,7 @@ class BlogPlugin {
 }
 
 void main() async {
-  final app = DartExpress();
+  final app = Fletch();
   
   // Mount blog plugin
   final blog = BlogPlugin().create();
@@ -325,7 +325,7 @@ Mount containers within containers:
 
 ```dart
 void main() async {
-  final app = DartExpress();
+  final app = Fletch();
   
   final api = IsolatedContainer(prefix: '/api');
   

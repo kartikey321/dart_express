@@ -7,7 +7,7 @@ Configure Cross-Origin Resource Sharing to allow your API to be accessed from di
 Enable CORS for all origins (development only):
 
 ```dart
-final app = DartExpress();
+final app = Fletch();
 
 app.use(app.cors());
 

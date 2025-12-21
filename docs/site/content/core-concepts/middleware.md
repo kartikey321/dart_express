@@ -1,6 +1,6 @@
 # Middleware
 
-Middleware functions are the building blocks of dart_express applications. They process requests, modify responses, and control the flow of execution.
+Middleware functions are the building blocks of Fletch applications. They process requests, modify responses, and control the flow of execution.
 
 ## What is Middleware?
 
@@ -26,7 +26,7 @@ Future<void> myMiddleware(Request req, Response res, NextFunction next) async {
 Applies to all routes:
 
 ```dart
-final app = DartExpress();
+final app = Fletch();
 
 // Logging middleware
 app.use((req, res, next) async {
@@ -213,7 +213,7 @@ app.use((req, res, next) async {
   req.session['timestamp'] = DateTime.now().toIso8601String();
   
   // Add custom headers to response
-  res.setHeader('X-Powered-By', 'dart_express');
+  res.setHeader('X-Powered-By', 'fletch');
   
   await next();
 });

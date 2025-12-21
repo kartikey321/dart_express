@@ -9,6 +9,7 @@ dependencies:
   jaspr: ^0.22.0
   jaspr_content: ^0.4.5
   jaspr_router: ^0.8.1
+  syntax_highlight_lite: ^0.0.1
   universal_html: ^2.3.0
 
 dev_dependencies:

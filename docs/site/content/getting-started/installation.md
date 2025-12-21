@@ -1,6 +1,6 @@
 # Installation
 
-Get started with dart_express in minutes.
+Get started with Fletch in minutes.
 
 ## Requirements
 
@@ -9,11 +9,11 @@ Get started with dart_express in minutes.
 
 ## Install via Pub
 
-Add dart_express to your `pubspec.yaml`:
+Add fletch to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  dart_express: ^1.0.0
+  fletch: ^1.0.0
 ```
 
 Then install dependencies:
@@ -27,13 +27,13 @@ dart pub get
 Create `bin/server.dart`:
 
 ```dart
-import 'package:dart_express/dart_express.dart';
+import 'package:fletch/fletch.dart';
 
 void main() async {
-  final app = DartExpress();
+  final app = Fletch();
   
   app.get('/', (req, res) {
-    res.text('Hello from dart_express!');
+    res.text('Hello from fletch!');
   });
   
   await app.listen(3000);
@@ -55,7 +55,7 @@ Test that everything works:
 
 ```bash
 curl http://localhost:3000
-# Output: Hello from dart_express!
+# Output: Hello from fletch!
 ```
 
 ## Optional Dependencies
@@ -75,7 +75,7 @@ dev_dependencies:
 
 ## Project Structure
 
-A typical dart_express project:
+A typical Fletch project:
 
 ```
 my_api/

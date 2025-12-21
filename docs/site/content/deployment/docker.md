@@ -1,6 +1,6 @@
 # Docker Deployment
 
-Deploy dart_express applications using Docker for consistent, reproducible environments.
+Deploy Fletch applications using Docker for consistent, reproducible environments.
 
 ## Quick Start
 
@@ -119,7 +119,7 @@ void main() async {
   final port = int.parse(Platform.environment['PORT'] ?? '3000');
   final sessionSecret = Platform.environment['SESSION_SECRET']!;
   
-  final app = DartExpress(
+  final app = Fletch(
     sessionSecret: sessionSecret,
     secureCookies: true,
   );

@@ -1,0 +1,47 @@
+Building jaspr for static rendering mode.
+⠋ Building web assets......⠙ Building web assets...... (1ms)[BUILDER] Starting daemon...
+[BUILDER] About to build [web]...
+[BUILDER] 0s jaspr_builder:codec_bundle on 88 inputs; $sdk|lib/$lib$
+[BUILDER] 0s jaspr_builder:styles_bundle on 88 inputs; $sdk|lib/$lib$
+[BUILDER] 0s jaspr_builder:clients_bundle on 88 inputs; $sdk|lib/$lib$
+[BUILDER] 0s jaspr_builder:codec_module on 2751 inputs; collection|lib/algorithms.dart
+[BUILDER] 0s jaspr_builder:codec_module on 2751 inputs: 1 skipped; collection|lib/collection.dart
+[BUILDER] 0s jaspr_builder:styles_module on 2754 inputs; collection|lib/algorithms.dart
+[BUILDER] 0s jaspr_builder:client_module on 2757 inputs; collection|lib/algorithms.dart
+[BUILDER] 0s jaspr_builder:codec_module on 2751 inputs: 2750 skipped, 1 no-op
+[BUILDER] 0s jaspr_builder:codec_bundle on 88 inputs: 88 skipped
+[BUILDER] 0s jaspr_builder:sync_mixins_module on 3 inputs; lib/components/clicker.dart
+[BUILDER] 0s jaspr_builder:sync_mixins_module on 3 inputs: 2 skipped, 1 no-op
+[BUILDER] 0s jaspr_builder:styles_module on 2754 inputs: 2753 skipped, 1 no-op
+[BUILDER] 0s jaspr_builder:styles_bundle on 88 inputs: 88 skipped
+[BUILDER] 0s jaspr_builder:imports_module on 6 inputs; lib/components/clicker.dart
+[BUILDER] 0s jaspr_builder:imports_module on 6 inputs: 5 skipped, 1 no-op
+[BUILDER] 0s jaspr_builder:stub on 1 input; lib/$lib$
+[BUILDER] 0s jaspr_builder:stub on 1 input: 1 skipped
+[BUILDER] 0s jaspr_builder:client_module on 2757 inputs: 2756 skipped, 1 no-op
+[BUILDER] 0s jaspr_builder:clients_bundle on 88 inputs: 88 skipped
+[BUILDER] 0s jaspr_builder:server_options on 1 input; lib/main.server.dart
+[BUILDER] 4s jaspr_builder:server_options on 1 input: 1 same; spent 3s analyzing
+[BUILDER] 0s jaspr_builder:import_output on 6 inputs; lib/components/clicker.imports.json
+[BUILDER] 0s jaspr_builder:import_output on 6 inputs: 1 skipped; lib/components/clicker.sync.imports.json
+[BUILDER] 0s jaspr_builder:import_output on 6 inputs: 6 skipped
+[BUILDER] 0s jaspr_builder:client_options on 1 input; lib/main.client.dart
+[BUILDER] 0s jaspr_builder:client_options on 1 input: 1 same
+[BUILDER] 0s jaspr_builder:client_entrypoint on 1 input; lib/main.client.dart
+[BUILDER] 0s jaspr_builder:client_entrypoint on 1 input: 1 skipped
+[BUILDER] 0s build_web_compilers:entrypoint_marker on 1 input; web/$web$
+[BUILDER] 0s build_web_compilers:entrypoint_marker on 1 input: 1 skipped
+[BUILDER] 0s build_web_compilers:entrypoint on 1 input; web/main.client.dart
+[BUILDER] 0s build_web_compilers:entrypoint on 1 input: 1 skipped
+[BUILDER] Built with build_runner/jit in 7s; wrote 3 outputs.
+Completed building web assets.
+⠋ Generating static site......⠙ Generating static site...... (0ms)⠹ [SERVER] Running server app...... (10ms)⠸ [SERVER] [INFO] Running server in release mode... (2.6s)⠼ [SERVER] Serving at http://0.0.0.0:8080... (2.6s)✓ [SERVER] Serving at http://0.0.0.0:8080 (2.6s)
+⠋ Generating routes......⠙ Generating routes...... (0ms)⠹ Generating route "/" (1/1)...... (0ms)✗ [SERVER] [ERROR] Error while building AsyncBuilder: (0.2s)
+⠋ Generating route "/advanced/isolated-containers" (2/12)......⠙ Generating route "/advanced/isolated-containers" (2/12)...... (0ms)⠹ Generating route "/security/cors" (3/12)...... (0.2s)✗ [SERVER] [ERROR] Error while building AsyncBuilder: (0.2s)
+⠋ Generating route "/getting-started/quick-start" (4/12)......⠙ Generating route "/getting-started/quick-start" (4/12)...... (0ms)✗ [SERVER] [ERROR] Error while building AsyncBuilder: (36ms)
+⠋ Generating route "/getting-started/installation" (5/12)......⠙ Generating route "/getting-started/installation" (5/12)...... (0ms)✗ [SERVER] [ERROR] Error while building AsyncBuilder: (13ms)
+⠋ Generating route "/deployment/docker" (6/12)......⠙ Generating route "/deployment/docker" (6/12)...... (0ms)✗ [SERVER] [ERROR] Error while building AsyncBuilder: (18ms)
+⠋ Generating route "/examples/todo-api" (7/12)......⠙ Generating route "/examples/todo-api" (7/12)...... (0ms)✗ [SERVER] [ERROR] Error while building AsyncBuilder: (34ms)
+⠋ Generating route "/core-concepts/routing" (8/12)......⠙ Generating route "/core-concepts/routing" (8/12)...... (0ms)⠹ Generating route "/core-concepts/middleware" (9/12)...... (25ms)⠸ Generating route "/core-concepts/sessions" (10/12)...... (53ms)✗ [SERVER] [ERROR] Error while building AsyncBuilder: (79ms)
+⠋ Generating route "/core-concepts/error-handling" (11/12)......⠙ Generating route "/core-concepts/error-handling" (11/12)...... (0ms)⠹ Generating route "/about" (12/12)...... (32ms)✗ [SERVER] [ERROR] Error while building AsyncBuilder: (46ms)
+Terminating server...

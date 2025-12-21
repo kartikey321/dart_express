@@ -69,13 +69,13 @@ void main() {
         // Out-of-the-box layout for documentation sites.
         DocsLayoutWithTocHighlighter(
           header: Header(
-            title: 'dart_express',
+            title: 'fletch',
             logo: '',
             items: [
               // Enables switching between light and dark mode.
               ThemeToggle(),
               // Shows github stats.
-              GitHubButton(repo: 'kartikey321/dart_express'),
+              GitHubButton(repo: 'kartikey321/fletch'),
             ],
           ),
           sidebar: Sidebar(

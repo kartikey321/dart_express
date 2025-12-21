@@ -1,16 +1,16 @@
 # Quick Start
 
-Build your first dart_express application in 5 minutes.
+Build your first Fletch application in 5 minutes.
 
 ## Basic Server
 
 Create a simple HTTP server:
 
 ```dart
-import 'package:dart_express/dart_express.dart';
+import 'package:fletch/fletch.dart';
 
 void main() async {
-  final app = DartExpress(
+  final app = Fletch(
     // Use a strong secret for signed session cookies.
     sessionSecret: 'change-me-to-a-32+char-random-secret',
     // Set to false only for local HTTP development.
@@ -19,7 +19,7 @@ void main() async {
 
   // Simple text response
   app.get('/', (req, res) {
-    res.text('Welcome to dart_express!');
+    res.text('Welcome to fletch!');
   });
 
   await app.listen(3000);
@@ -123,7 +123,7 @@ app.use(app.cors(
 Add user sessions:
 
 ```dart
-final app = DartExpress(
+final app = Fletch(
   sessionSecret: 'your-secret-key-min-32-chars!',
 );
 
@@ -163,10 +163,10 @@ app.use((req, res, next) async {
 A full-featured API server:
 
 ```dart
-import 'package:dart_express/dart_express.dart';
+import 'package:fletch/fletch.dart';
 
 void main() async {
-  final app = DartExpress(
+  final app = Fletch(
     sessionSecret: 'my-super-secret-key-min-32-chars',
   );
 
@@ -209,7 +209,7 @@ void main() async {
 For production use:
 
 ```dart
-final app = DartExpress(
+final app = Fletch(
   sessionSecret: Platform.environment['SESSION_SECRET']!,
   secureCookies: true, // HTTPS only
 );
@@ -234,5 +234,5 @@ Always use environment variables for secrets in production!
 </div>
 
 <Tip>
-Check out the TODO API example in `/apps/dart_express_examples/todo_api_example` for a complete REST API!
+Check out the TODO API example in `/apps/fletch_examples/todo_api_example` for a complete REST API!
 </Tip>

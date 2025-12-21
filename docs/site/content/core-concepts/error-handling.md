@@ -32,7 +32,7 @@ Catch all unhandled errors:
 
 ```dart
 void main() async {
-  final app = DartExpress();
+  final app = Fletch();
   
   // Your routes
   app.get('/', myHandler);
@@ -327,7 +327,7 @@ Handle routes that don't exist:
 
 ```dart
 void main() async {
-  final app = DartExpress();
+  final app = Fletch();
   
   // Your routes
   app.get('/users', getUserHandler);

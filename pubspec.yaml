@@ -1,4 +1,4 @@
-name: dart_express_project
+name: fletch_project
 
 environment:
   sdk: ^3.6.0

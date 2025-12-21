@@ -1,0 +1,13 @@
+name: fletch_benchmark
+description: Performance benchmarks for fletch framework
+version: 1.0.0
+publish_to: none
+
+environment:
+  sdk: ^3.0.0
+
+dependencies:
+  fletch:
+    path: ..
+  http: ^1.1.0
+  logger: ^2.0.0

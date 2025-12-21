@@ -1,14 +1,14 @@
-# About dart_express
+# About Fletch
 
-dart_express is a web framework for Dart inspired by Express.js, designed to make building HTTP servers simple, intuitive, and productive.
+Fletch is a web framework for Dart inspired by Express.js, designed to make building HTTP servers simple, intuitive, and productive.
 
 ## Philosophy
 
 ### Simplicity First
-dart_express follows the Express.js philosophy: provide a minimal, flexible framework that doesn't get in your way.
+Fletch follows the Express.js philosophy: provide a minimal, flexible framework that doesn't get in your way.
 
 ```dart
-final app = DartExpress();
+final app = Fletch();
 app.get('/', (req, res) => res.text('Simple!'));
 await app.listen(3000);
 ```
@@ -59,7 +59,7 @@ Every request flows through:
 
 ### Core Components
 
-#### **DartExpress**
+#### **Fletch**
 The main application class. Manages middleware, routing, and server lifecycle.
 
 #### **Request**
@@ -89,7 +89,7 @@ Radix-tree based router for fast path matching with support for:
 Built-in session management with pluggable stores:
 
 ```dart
-final app = DartExpress(
+final app = Fletch(
   sessionSecret: 'your-secret-key',
   sessionStore: MemorySessionStore(), // Default
 );
@@ -137,7 +137,7 @@ app.get('/users', (req, res) {
 
 ## Performance
 
-dart_express is designed for performance:
+Fletch is designed for performance:
 
 - **Radix Tree Router**: O(log n) route matching
 - **Zero-copy Body Parsing**: Efficient request handling  
@@ -146,13 +146,13 @@ dart_express is designed for performance:
 
 Run benchmarks:
 ```bash
-cd packages/dart_express/benchmark
+cd packages/fletch/benchmark
 dart run bin/run_benchmarks.dart
 ```
 
 ## Comparison
 
-| Feature | dart_express | Shelf | Aqueduct |
+| Feature | Fletch | Shelf | Aqueduct |
 |---------|-------------|-------|----------|
 | Express-like API | ✅ | ❌ | ❌ |
 | Built-in Sessions | ✅ | ❌ | ✅ |
@@ -164,13 +164,13 @@ dart run bin/run_benchmarks.dart
 
 Check out these complete examples:
 
-- **TODO API** - Full REST API at `/apps/dart_express_examples/todo_api_example`
-- **Session Auth** - Authentication demo at `/apps/dart_express_examples/session_security_example`
-- **MongoDB** - Database integration at `/apps/dart_express_examples/mongo_example`
+- **TODO API** - Full REST API at `/apps/fletch_examples/todo_api_example`
+- **Session Auth** - Authentication demo at `/apps/fletch_examples/session_security_example`
+- **MongoDB** - Database integration at `/apps/fletch_examples/mongo_example`
 
 ## Contributing
 
-We welcome contributions! Check out our [GitHub repository](https://github.com/kartikey321/dart_express) to:
+We welcome contributions! Check out our [GitHub repository](https://github.com/kartikey321/fletch) to:
 
 - Report bugs
 - Suggest features
@@ -179,11 +179,11 @@ We welcome contributions! Check out our [GitHub repository](https://github.com/k
 
 ## License
 
-dart_express is open source software licensed under the MIT license.
+Fletch is open source software licensed under the MIT license.
 
 ---
 
-Ready to build something? Check out the [GitHub repo](https://github.com/kartikey321/dart_express) to get started!
+Ready to build something? Check out the [GitHub repo](https://github.com/kartikey321/fletch) to get started!
 
 <div style="display:flex;justify-content:flex-start;gap:1rem;align-items:center;margin:2rem 0;">
   <a href="/advanced/isolated-containers" style="display:flex;align-items:center;gap:0.4rem;text-decoration:none;color:inherit;">

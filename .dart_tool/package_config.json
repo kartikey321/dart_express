@@ -224,7 +224,7 @@
       "languageVersion": "3.1"
     },
     {
-      "name": "dart_express_project",
+      "name": "fletch_project",
       "rootUri": "../",
       "packageUri": "lib/",
       "languageVersion": "3.6"

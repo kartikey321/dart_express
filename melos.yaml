@@ -1,4 +1,4 @@
-name: dart_express_project
+name: fletch_project
 
 packages:
   - apps/**

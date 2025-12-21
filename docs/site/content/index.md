@@ -1,4 +1,4 @@
-# dart_express
+# Fletch
 
 Express-style developer ergonomics, Dart performance, and production-first defaults.
 
@@ -14,7 +14,7 @@ Express-style developer ergonomics, Dart performance, and production-first defau
 
 ```yaml
 dependencies:
-  dart_express: ^1.0.0
+  fletch: ^1.0.0
 ```
 
 ```bash
@@ -24,10 +24,10 @@ dart pub get
 ## Minimal app
 
 ```dart
-import 'package:dart_express/dart_express.dart';
+import 'package:fletch/fletch.dart';
 
 Future<void> main() async {
-  final app = DartExpress(
+  final app = Fletch(
     sessionSecret: 'change-me-to-a-32+char-random-secret',
   );
 
@@ -42,7 +42,7 @@ Future<void> main() async {
 }
 ```
 
-For local HTTP testing, you can set `secureCookies: false` when constructing `DartExpress`; keep it `true` in production.
+For local HTTP testing, you can set `secureCookies: false` when constructing `Fletch`; keep it `true` in production.
 
 ## Production highlights
 
@@ -61,4 +61,4 @@ For local HTTP testing, you can set `secureCookies: false` when constructing `Da
 
 ---
 
-⭐ [GitHub](https://github.com/kartikey321/dart_express) • 🐛 Issues • 💬 Discussions (coming soon)
+⭐ [GitHub](https://github.com/kartikey321/fletch) • 🐛 Issues • 💬 Discussions (coming soon)

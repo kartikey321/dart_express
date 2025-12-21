@@ -1,13 +1,13 @@
 # Sessions
 
-dart_express provides built-in session management with pluggable storage backends.
+Fletch provides built-in session management with pluggable storage backends.
 
 ## Quick Start
 
 Enable sessions with a secret key:
 
 ```dart
-final app = DartExpress(
+final app = Fletch(
   sessionSecret: 'your-secret-key-min-32-characters-long!',
 );
 
@@ -80,7 +80,7 @@ app.post('/logout', (req, res) {
 Good for development, not for production:
 
 ```dart
-final app = DartExpress(
+final app = Fletch(
   sessionSecret: 'secret',
   sessionStore: MemorySessionStore(), // Default
 );
@@ -128,7 +128,7 @@ class RedisSessionStore implements SessionStore {
 }
 
 // Usage
-final app = DartExpress(
+final app = Fletch(
   sessionSecret: 'secret',
   sessionStore: RedisSessionStore(redisClient),
 );
@@ -141,7 +141,7 @@ final app = DartExpress(
 **Required** - Used to sign session cookies:
 
 ```dart
-final app = DartExpress(
+final app = Fletch(
   sessionSecret: Platform.environment['SESSION_SECRET']!,
 );
 ```
@@ -157,7 +157,7 @@ Requirements:
 Enable for HTTPS (production):
 
 ```dart
-final app = DartExpress(
+final app = Fletch(
   sessionSecret: 'secret',
   secureCookies: true, // HTTPS only
 );
@@ -168,7 +168,7 @@ final app = DartExpress(
 Customize the session cookie name:
 
 ```dart
-final app = DartExpress(
+final app = Fletch(
   sessionSecret: 'secret',
   sessionCookieName: 'my_app_session',
 );
@@ -180,7 +180,7 @@ Complete login/logout flow:
 
 ```dart
 void main() async {
-  final app = DartExpress(
+  final app = Fletch(
     sessionSecret: Platform.environment['SESSION_SECRET']!,
     secureCookies: true,
   );
@@ -234,7 +234,7 @@ Future<void> requireAuth(Request req, Response res, NextFunction next) async {
 Sessions expire after inactivity:
 
 ```dart
-final app = DartExpress(
+final app = Fletch(
   sessionSecret: 'secret',
   sessionStore: MemorySessionStore(
     cleanupInterval: Duration(minutes: 5),  // Cleanup frequency
@@ -264,7 +264,7 @@ dart run -e "import 'dart:math'; import 'dart:convert'; print(base64Encode(List.
 ### 2. HTTPS Only in Production
 
 ```dart
-final app = DartExpress(
+final app = Fletch(
   sessionSecret: secret,
   secureCookies: Platform.environment['ENV'] == 'production',
 );

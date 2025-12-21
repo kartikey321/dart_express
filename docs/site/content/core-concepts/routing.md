@@ -1,13 +1,13 @@
 # Routing
 
-dart_express uses a fast radix-tree router to match incoming requests to handlers.
+Fletch uses a fast radix-tree router to match incoming requests to handlers.
 
 ## Basic Routes
 
 Define routes for different HTTP methods:
 
 ```dart
-final app = DartExpress();
+final app = Fletch();
 
 app.get('/users', (req, res) {
   res.json({'users': []});
@@ -128,7 +128,7 @@ class UserController {
 }
 
 void main() {
-  final app = DartExpress();
+  final app = Fletch();
   final users = UserController();
   
   app.get('/users', users.getAll);

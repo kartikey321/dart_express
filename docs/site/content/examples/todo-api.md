@@ -14,7 +14,7 @@ This example shows:
 ## Complete Code
 
 ```dart
-import 'package:dart_express/dart_express.dart';
+import 'package:fletch/fletch.dart';
 
 class Todo {
   final String id;
@@ -38,7 +38,7 @@ class Todo {
 }
 
 void main() async {
-  final app = DartExpress();
+  final app = Fletch();
   
   // In-memory storage
   final todos = <String, Todo>{};
@@ -289,12 +289,12 @@ app.get('/todos', (req, res) {
 
 The full example is available at:
 ```
-/apps/dart_express_examples/todo_api_example
+/apps/fletch_examples/todo_api_example
 ```
 
 Run it:
 ```bash
-cd apps/dart_express_examples/todo_api_example
+cd apps/fletch_examples/todo_api_example
 dart run bin/server.dart
 ```
 

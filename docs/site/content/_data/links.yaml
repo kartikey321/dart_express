@@ -1,3 +1,23 @@
-website: https://jaspr.site
-docs: https://docs.jaspr.site/content
-quickstart: https://docs.jaspr.site/content/quick_start
+# Reusable links for markdown files
+# Use in markdown as: {{links.github}}
+
+# Main links
+github: https://github.com/kartikey321/fletch
+docs: https://fletch.dev
+pubdev: https://pub.dev/packages/fletch
+
+# Documentation sections
+installation: /getting-started/installation
+quickstart: /getting-started/quick-start
+routing: /core-concepts/routing
+middleware: /core-concepts/middleware
+sessions: /core-concepts/sessions
+
+# Examples
+example_todo: /examples/todo-api
+example_repo: https://github.com/kartikey321/fletch/tree/main/apps/fletch_examples
+
+# External resources
+dart: https://dart.dev
+express: https://expressjs.com
+pub: https://pub.dev

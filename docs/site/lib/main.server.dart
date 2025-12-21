@@ -69,8 +69,8 @@ void main() {
         // Out-of-the-box layout for documentation sites.
         DocsLayoutWithTocHighlighter(
           header: Header(
-            title: 'fletch',
-            logo: '',
+            title: 'Fletch',
+            logo: '/images/logo.svg',
             items: [
               // Enables switching between light and dark mode.
               ThemeToggle(),

@@ -1,8 +1,26 @@
-# fletch
+# Fletch
+
+[![pub package](https://img.shields.io/pub/v/fletch.svg)](https://pub.dev/packages/fletch)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
 An Express-inspired HTTP framework for Dart. It brings familiar routing,
 middleware, and dependency-injection patterns to `dart:io` while remaining
 lightweight and dependency-free beyond `GetIt`.
+
+📚 **[Documentation](https://docs.fletch.mahawarkartikey.in/)** | 
+🐛 **[Issues](https://github.com/kartikey321/fletch/issues)** | 
+💬 **[Discussions](https://github.com/kartikey321/fletch/discussions)**
+
+## Why Fletch?
+
+If you're coming from **Express.js** or **Node.js**, Fletch will feel instantly familiar:
+
+- ✅ **Express-like API** - `app.get()`, `app.post()`, middleware, it's all here
+- ⚡ **Fast** - Radix-tree routing, minimal overhead
+- 🔒 **Secure by default** - HMAC-signed sessions, CORS, rate limiting built-in
+- 🎯 **Production-ready** - Graceful shutdown, request timeouts, error handling
+- 🧩 **Modular** - Controllers, isolated containers, dependency injection
+- 📦 **Lightweight** - Minimal dependencies, pure Dart
 
 ## Features
 
@@ -141,11 +159,23 @@ Or use the built-in helper:
 dart run tool/bench.dart --url http://localhost:8080/health --count 1000 --concurrency 32
 ```
 
+## Documentation
+
+Full documentation is available at **[docs.fletch.mahawarkartikey.in](https://docs.fletch.mahawarkartikey.in/)**.
+
 ## Contributing
 
-- Run `dart format .` and `dart analyze` before submitting patches.
-- Add regression tests under `test/` for routing/middleware changes.
-- File issues or feature requests in the repository issue tracker.
+Contributions are welcome! Please:
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Run `dart format .` and `dart analyze`
+4. Add tests for new features
+5. Commit your changes (`git commit -m 'Add amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
+File issues or feature requests in the [repository issue tracker](https://github.com/kartikey321/fletch/issues).
 
 ## License
 

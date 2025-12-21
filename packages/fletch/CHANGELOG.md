@@ -7,7 +7,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.1.0] - 2024-12-13
+## [1.1.0] - 2025-01-22
+
+### 💥 BREAKING CHANGES - Package Rename
+
+**The package has been renamed from `dart_express` to `fletch`**
+
+- **Package name**: `dart_express` → `fletch`
+- **Main class**: `DartExpress` → `Fletch`
+- **Import path**: `package:dart_express` → `package:fletch`
+- **Repository**: Moved to `https://github.com/kartikey321/fletch`
+
+### Migration Guide
+
+To migrate from dart_express to fletch:
+
+1. **Update `pubspec.yaml`**:
+   ```yaml
+   dependencies:
+     fletch: ^1.1.0  # was: dart_express: ^1.0.0
+   ```
+
+2. **Update imports**:
+   ```dart
+   import 'package:fletch/fletch.dart';  // was: package:dart_express/dart_express.dart
+   ```
+
+3. **Update class usage**:
+   ```dart
+   final app = Fletch();  // was: DartExpress()
+   ```
+
+4. Run `dart pub get` to update dependencies
+
+### Documentation
+- **New documentation site**: https://docs.fletch.mahawarkartikey.in/
+- Updated all examples and guides
+- Improved API documentation
+
+### Note
+All functionality remains the same. This is purely a rename for better branding and pub.dev availability.
+
+---
+
+## [1.0.0] - 2024-12-13
 
 ### 🔒 Security Enhancements
 - **Added HMAC-SHA256 session signing**: Session cookies are now cryptographically signed to prevent tampering

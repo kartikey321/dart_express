@@ -23,6 +23,7 @@ If you're coming from **Express.js** or **Node.js**, Fletch will feel instantly 
 - ✅ **Express-like API** - `app.get()`, `app.post()`, middleware, it's all here
 - ⚡ **Fast** - Radix-tree routing, minimal overhead
 - 🔒 **Secure by default** - HMAC-signed sessions, CORS, rate limiting built-in
+- 📡 **Real-time** - Built-in SSE and streaming support
 - 🎯 **Production-ready** - Graceful shutdown, request timeouts, error handling
 - 🧩 **Modular** - Controllers, isolated containers, dependency injection
 - 📦 **Lightweight** - Minimal dependencies, pure Dart
@@ -31,6 +32,9 @@ If you're coming from **Express.js** or **Node.js**, Fletch will feel instantly 
 
 - Fast radix-tree router with support for path parameters and nested routers
 - Middleware pipeline with global and per-route handlers
+- Server-Sent Events (SSE) for real-time server-to-client streaming
+- Generic streaming support for files and chunked data
+- Full HTTP method support (GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS)
 - `GetIt`-powered dependency injection (supports async/lazy registrations)
 - Controller abstraction for modular route registration
 - Optional isolated containers for mounting self-contained sub-apps
@@ -115,6 +119,51 @@ by itself:
 
 ```dart
 await admin.listen(9090); // optional
+```
+
+## Real-time with SSE
+
+Server-Sent Events enable real-time server-to-client streaming:
+
+```dart
+app.get('/events', (req, res) async {
+  await res.sse((sink) async {
+    // Send events
+    await sink.sendEvent('Welcome!', type: 'greeting');
+    
+    for (var i = 0; i < 10; i++) {
+      await sink.sendEvent('Event $i', id: '$i');
+      await Future.delayed(Duration(seconds: 1));
+    }
+  }, keepAlive: Duration(seconds: 30));
+});
+```
+
+## Streaming responses
+
+Stream files or chunked data efficiently:
+
+```dart
+// Stream a file
+app.get('/download/:filename', (req, res) async {
+  final filename = req.params['filename']!;
+  final file = File('uploads/$filename');
+  
+  await res.stream(
+    file.openRead(),
+    contentType: 'application/octet-stream',
+  );
+});
+
+// Stream generated data
+app.get('/data', (req, res) async {
+  final stream = Stream.periodic(
+    Duration(milliseconds: 100),
+    (i) => utf8.encode('chunk-$i\n'),
+  ).take(50);
+  
+  await res.stream(stream, flushEachChunk: true);
+});
 ```
 
 ## Example project

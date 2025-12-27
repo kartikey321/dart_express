@@ -17,9 +17,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Optional `flushEachChunk` for real-time delivery
   - Example: `example/stream_example.dart`
 - **Response utility** - `Response.status()` chainable status code setter
+- **HEAD HTTP method** - Added `RequestTypes.HEAD` constant and `head()` method
+  - Available in `Fletch`, `IsolatedContainer`, and `BaseContainer`
 - Integration tests for SSE and streaming (16 tests, all passing)
 
 ### Changed
+- **HTTP method refactoring** - Moved HTTP method handlers to `BaseContainer`
+  - Eliminated code duplication between `Fletch` and `IsolatedContainer`
+  - All HTTP methods (get, post, put, patch, delete, head, options) now inherited from base
+  - `IsolatedContainer` overrides `addRoute()` for path normalization
 - `Response.send()` is now `Future<void>` (was `void`) - all call sites updated to `await`
 - Stream cleanup with try-finally blocks to prevent socket leaks
 - Using `httpResponse.headers.chunkedTransferEncoding = true` instead of manual headers

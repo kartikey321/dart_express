@@ -10,6 +10,7 @@ void main(List<String> arguments) async {
   app.setErrorHandler((err, req, res) async {
     print(err);
   });
+  
 
   app.get('/users', (req, res) async {
     String projectPath = Directory.current.path;
@@ -17,7 +18,6 @@ void main(List<String> arguments) async {
     print('File exists: ${await file.exists()}');
     print(file.path);
     var bytes = await file.readAsBytes();
-
     res.bytes(bytes, contentType: 'image/jpeg');
   });
   app.get('/users1', (req, res) async {

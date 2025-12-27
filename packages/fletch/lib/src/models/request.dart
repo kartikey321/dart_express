@@ -107,7 +107,7 @@ class Request {
   ///
   /// Body is parsed based on Content-Type header:
   /// - `application/json` → Decoded JSON (Map or List)
-  /// - `application/x-www-form-urlencoded` → Map<String, String>
+  /// - `application/x-www-form-urlencoded` → Map(String, String)
   /// - `text/*` → String
   /// - Other → Uint8List (raw bytes)
   ///

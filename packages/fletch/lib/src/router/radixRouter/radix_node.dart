@@ -1,5 +1,5 @@
 // radix_node.dart
-part of 'radix_router.dart';
+part of 'radix_route.dart';
 
 /// Represents a node in the radix tree routing structure
 class RadixNode {

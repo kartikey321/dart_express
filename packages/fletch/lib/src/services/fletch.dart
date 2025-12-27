@@ -13,9 +13,10 @@ class RequestTypes {
   static const String PATCH = 'PATCH';
   static const String DELETE = 'DELETE';
   static const String OPTIONS = 'OPTIONS';
-
-  static const List<String> allTypes = [GET, POST, PUT, PATCH, DELETE, OPTIONS];
+  static const String HEAD = 'HEAD';
+  static const List<String> allTypes = [GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS];
 }
+
 
 /// A production-ready web framework for Dart inspired by Express.js.
 ///
@@ -199,80 +200,9 @@ class Fletch extends BaseContainer {
   /// // With middleware
   /// app.get('/admin', adminHandler, middleware: [authMiddleware]);
   /// ```
-  void get(String path, RequestHandler handler,
-      {List<MiddlewareHandler>? middleware}) {
-    addRoute(RequestTypes.GET, path, handler, middleware: middleware);
-  }
+// HTTP method handlers (get, post, put, patch, delete, head, options)
+// are inherited from BaseContainer
 
-  /// Registers a POST route handler at [path].
-  ///
-  /// Commonly used for creating resources. Optional [middleware] runs first.
-  ///
-  /// ## Example
-  ///
-  /// ```dart
-  /// app.post('/users', (req, res) async {
-  ///   final data = await req.body;
-  ///   // Create user...
-  ///   res.json({'created': true}, statusCode: 201);
-  /// });
-  /// ```
-  void post(String path, RequestHandler handler,
-      {List<MiddlewareHandler>? middleware}) {
-    addRoute(RequestTypes.POST, path, handler, middleware: middleware);
-  }
-
-  /// Registers a PUT route handler at [path].
-  ///
-  /// Typically used for full resource updates.
-  ///
-  /// ## Example
-  ///
-  /// ```dart
-  /// app.put('/users/:id', (req, res) async {
-  ///   final id = req.params['id'];
-  ///   final data = await req.body;
-  ///   // Update user...
-  ///   res.json({'updated': true});
-  /// });
-  /// ```
-  void put(String path, RequestHandler handler,
-      {List<MiddlewareHandler>? middleware}) {
-    addRoute(RequestTypes.PUT, path, handler, middleware: middleware);
-  }
-
-  /// Registers a PATCH route handler at [path].
-  ///
-  /// Typically used for partial resource updates.
-  void patch(String path, RequestHandler handler,
-      {List<MiddlewareHandler>? middleware}) {
-    addRoute(RequestTypes.PATCH, path, handler, middleware: middleware);
-  }
-
-  /// Registers a DELETE route handler at [path].
-  ///
-  /// Used for deleting resources.
-  ///
-  /// ## Example
-  ///
-  /// ```dart
-  /// app.delete('/users/:id', (req, res) {
-  ///   final id = req.params['id'];
-  ///   // Delete user...
-  ///   res.json({'deleted': true});
-  /// });
-  /// ```
-  void delete(String path, RequestHandler handler,
-      {List<MiddlewareHandler>? middleware}) {
-    addRoute(RequestTypes.DELETE, path, handler, middleware: middleware);
-  }
-
-  /// Registers an `OPTIONS` handler at [path]. Optional [middleware] run after
-  /// global middleware but before the handler executes.
-  void options(String path, RequestHandler handler,
-      {List<MiddlewareHandler>? middleware}) {
-    addRoute(RequestTypes.OPTIONS, path, handler, middleware: middleware);
-  }
 
   final Map<HttpServer, Future<void>> _serverLifecycles = {};
 

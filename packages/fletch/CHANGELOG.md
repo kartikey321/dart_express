@@ -7,50 +7,96 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.1.0] - 2025-01-22
+## [2.0.2] - 2025-01-27
 
-### 💥 BREAKING CHANGES - Package Rename
+### Added
+- **Server-Sent Events (SSE)** - `Response.sse()` for real-time server-to-client streaming
+  - `SSESink` class with `sendEvent()`, `sendComment()`, keep-alive support
+  - Example: `example/sse_example.dart`
+- **Generic streaming** - `Response.stream()` for streaming files and data
+  - Optional `flushEachChunk` for real-time delivery
+  - Example: `example/stream_example.dart`
+- **Response utility** - `Response.status()` chainable status code setter
+- Integration tests for SSE and streaming (16 tests, all passing)
 
-**The package has been renamed from `dart_express` to `fletch`**
+### Changed
+- `Response.send()` is now `Future<void>` (was `void`) - all call sites updated to `await`
+- Stream cleanup with try-finally blocks to prevent socket leaks
+- Using `httpResponse.headers.chunkedTransferEncoding = true` instead of manual headers
+- Mutual exclusion between `stream()`, `sse()`, and `body`/`bytes` responses
 
-- **Package name**: `dart_express` → `fletch`
-- **Main class**: `DartExpress` → `Fletch`
-- **Import path**: `package:dart_express` → `package:fletch`
-- **Repository**: Moved to `https://github.com/kartikey321/fletch`
+### Fixed
+- Unawaited futures in `base_container.dart` and `fletch.dart`
+- `SSESink.sendComment()` is now `Future<void>` for proper error propagation
+- Keep-alive errors using `unawaited()` for fire-and-forget operations
 
-### Migration Guide
-
-To migrate from dart_express to fletch:
-
-1. **Update `pubspec.yaml`**:
-   ```yaml
-   dependencies:
-     fletch: ^1.1.0  # was: dart_express: ^1.0.0
-   ```
-
-2. **Update imports**:
-   ```dart
-   import 'package:fletch/fletch.dart';  // was: package:dart_express/dart_express.dart
-   ```
-
-3. **Update class usage**:
-   ```dart
-   final app = Fletch();  // was: DartExpress()
-   ```
-
-4. Run `dart pub get` to update dependencies
+## [2.0.1] - 2025-01-23
 
 ### Documentation
-- **New documentation site**: https://docs.fletch.mahawarkartikey.in/
-- Updated all examples and guides
-- Improved API documentation
+- Added Fletch logo to README with baseline alignment
+- Improved README visual presentation
 
-### Note
-All functionality remains the same. This is purely a rename for better branding and pub.dev availability.
+## [2.0.0] - 2025-01-22
+
+### 💥 BREAKING CHANGES - Complete Package Repurposing
+
+**This package has been completely repurposed from a jQuery-like library to an Express-inspired HTTP framework.**
+
+#### Package History
+
+- **Versions 0.1.0 - 0.3.0** (2014): jQuery-like library by [Rob Kellett](https://github.com/RobKellett)
+- **Version 2.0.0** (2025): Express-inspired HTTP framework by Kartikey Mahawar
+
+Thank you to Rob Kellett for graciously transferring the package name to enable this new project!
+
+#### For Users of the Original Library (v0.3.0)
+
+If you were using the jQuery-like library:
+- **Version 0.3.0 remains available**: https://pub.dev/packages/fletch/versions/0.3.0
+- **Original repository**: https://github.com/RobKellett/Fletch
+- **Pin your version** in `pubspec.yaml`:
+  ```yaml
+  dependencies:
+    fletch: 0.3.0
+  ```
+
+#### What's New in 2.0.0
+
+This is a completely new HTTP framework with:
+
+- **Express-like API**: Familiar `app.get()`, `app.post()`, middleware patterns
+- **Production-ready**: HMAC-signed sessions, CORS, rate limiting
+- **Fast routing**: Radix-tree router with path parameters
+- **Dependency injection**: GetIt-powered DI container
+- **Modular design**: Controllers, isolated containers
+- **Comprehensive docs**: https://docs.fletch.mahawarkartikey.in/
+
+### Features
+
+- ✅ Express-inspired routing and middleware
+- ✅ Built-in session management with HMAC signing
+- ✅ CORS and rate limiting middleware
+- ✅ Request/response helpers (`req.params`, `res.json()`)
+- ✅ Error handling with custom error types
+- ✅ Graceful shutdown support
+- ✅ 98 passing tests
+- ✅ Full TypeScript-like type safety
+
+### Documentation
+
+- **Homepage**: https://docs.fletch.mahawarkartikey.in/
+- **GitHub**: https://github.com/kartikey321/fletch
+- **Examples**: See `/example` directory
 
 ---
 
-## [1.0.0] - 2024-12-13
+## [0.3.0] - 2014-07-26 (Original Package by Rob Kellett)
+
+jQuery-like library for Dart. See [original repository](https://github.com/RobKellett/Fletch) for details.
+
+---
+
+## [1.0.0] - 2024-12-13 (Internal Development Version)
 
 ### 🔒 Security Enhancements
 - **Added HMAC-SHA256 session signing**: Session cookies are now cryptographically signed to prevent tampering
@@ -79,7 +125,3 @@ All functionality remains the same. This is purely a rename for better branding 
 
 ### Dependencies
 - Added: `crypto: ^3.0.3`
-
-## [1.0.0] - Previous Release
-
-- Initial version

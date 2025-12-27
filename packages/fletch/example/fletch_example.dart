@@ -39,7 +39,7 @@ Future<void> main() async {
   });
   admin.get('/', (req, res) => res.text('Welcome to the admin module'));
   admin.get('/stats', (req, res) async {
-    res.json({'uptimeSeconds': ProcessInfo.currentRss});
+    res.status(200).json({'uptimeSeconds': ProcessInfo.currentRss});
   });
   admin.mount(app);
 

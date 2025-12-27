@@ -122,6 +122,51 @@ abstract class BaseContainer {
     router.addRoute(method, path, wrappedHandler);
   }
 
+  /// Registers a GET route handler at [path].
+  void get(String path, RequestHandler handler,
+      {List<MiddlewareHandler>? middleware}) {
+    addRoute(RequestTypes.GET, path, handler, middleware: middleware);
+  }
+
+  /// Registers a POST route handler at [path].
+  void post(String path, RequestHandler handler,
+      {List<MiddlewareHandler>? middleware}) {
+    addRoute(RequestTypes.POST, path, handler, middleware: middleware);
+  }
+
+  /// Registers a PUT route handler at [path].
+  void put(String path, RequestHandler handler,
+      {List<MiddlewareHandler>? middleware}) {
+    addRoute(RequestTypes.PUT, path, handler, middleware: middleware);
+  }
+
+  /// Registers a PATCH route handler at [path].
+  void patch(String path, RequestHandler handler,
+      {List<MiddlewareHandler>? middleware}) {
+    addRoute(RequestTypes.PATCH, path, handler, middleware: middleware);
+  }
+
+  /// Registers a DELETE route handler at [path].
+  void delete(String path, RequestHandler handler,
+      {List<MiddlewareHandler>? middleware}) {
+    addRoute(RequestTypes.DELETE, path, handler, middleware: middleware);
+  }
+
+  /// Registers a HEAD route handler at [path].
+  ///
+  /// HEAD requests are identical to GET except the server must not return
+  /// a message body in the response.
+  void head(String path, RequestHandler handler,
+      {List<MiddlewareHandler>? middleware}) {
+    addRoute(RequestTypes.HEAD, path, handler, middleware: middleware);
+  }
+
+  /// Registers an OPTIONS route handler at [path].
+  void options(String path, RequestHandler handler,
+      {List<MiddlewareHandler>? middleware}) {
+    addRoute(RequestTypes.OPTIONS, path, handler, middleware: middleware);
+  }
+
   /// Orchestrates the full request lifecycle: building framework abstractions,
   /// resolving routes, executing middleware/handlers and finally flushing the
   /// response (including error handling and session propagation).

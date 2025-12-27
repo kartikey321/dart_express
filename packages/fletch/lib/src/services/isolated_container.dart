@@ -28,39 +28,11 @@ class IsolatedContainer extends BaseContainer {
 
   final Map<String, dynamic> cache = {};
 
-  void get(String path, RequestHandler handler,
+  /// Override addRoute to normalize paths for isolated containers.
+  @override
+  void addRoute(String method, String path, RequestHandler handler,
       {List<MiddlewareHandler>? middleware}) {
-    addRoute(RequestTypes.GET, _normalizeLocalPath(path), handler,
-        middleware: middleware);
-  }
-
-  void post(String path, RequestHandler handler,
-      {List<MiddlewareHandler>? middleware}) {
-    addRoute(RequestTypes.POST, _normalizeLocalPath(path), handler,
-        middleware: middleware);
-  }
-
-  void put(String path, RequestHandler handler,
-      {List<MiddlewareHandler>? middleware}) {
-    addRoute(RequestTypes.PUT, _normalizeLocalPath(path), handler,
-        middleware: middleware);
-  }
-
-  void patch(String path, RequestHandler handler,
-      {List<MiddlewareHandler>? middleware}) {
-    addRoute(RequestTypes.PATCH, _normalizeLocalPath(path), handler,
-        middleware: middleware);
-  }
-
-  void delete(String path, RequestHandler handler,
-      {List<MiddlewareHandler>? middleware}) {
-    addRoute(RequestTypes.DELETE, _normalizeLocalPath(path), handler,
-        middleware: middleware);
-  }
-
-  void options(String path, RequestHandler handler,
-      {List<MiddlewareHandler>? middleware}) {
-    addRoute(RequestTypes.OPTIONS, _normalizeLocalPath(path), handler,
+    super.addRoute(method, _normalizeLocalPath(path), handler,
         middleware: middleware);
   }
 

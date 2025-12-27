@@ -1,4 +1,9 @@
-# Fletch
+<h1>
+  <img src="https://docs.fletch.mahawarkartikey.in/images/logo.svg" alt="Fletch Logo" height="100" style="vertical-align: bottom; margin-right: 10px;"/>
+  Fletch
+</h1>
+
+<br clear="left"/>
 
 [![pub package](https://img.shields.io/pub/v/fletch.svg)](https://pub.dev/packages/fletch)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
@@ -153,11 +158,6 @@ app.setErrorHandler((error, req, res) async {
 - Request parsing currently buffers the entire body; set upstream limits (e.g.
   via load balancer) and prefer streaming uploads for very large payloads.
 
-Or use the built-in helper:
-
-```bash
-dart run tool/bench.dart --url http://localhost:8080/health --count 1000 --concurrency 32
-```
 
 ## Documentation
 

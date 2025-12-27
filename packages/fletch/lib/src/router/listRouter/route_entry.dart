@@ -1,5 +1,5 @@
 // route_entry.dart
-part of 'list_router.dart';
+part of 'list_route.dart';
 
 class _RoutePattern {
   final RegExp regex;

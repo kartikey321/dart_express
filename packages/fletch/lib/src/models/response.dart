@@ -5,6 +5,8 @@ import 'dart:typed_data';
 
 import 'package:mime/mime.dart';
 
+import 'sse_sink.dart';
+
 /// Represents an outgoing HTTP response with helpers for common response types.
 ///
 /// Response objects are passed to route handlers alongside [Request] objects.
@@ -40,6 +42,16 @@ class Response {
 
   bool _isSent = false;
   final List<Cookie> _cookies = [];
+
+  // Streaming fields
+  Stream<List<int>>? _streamData;
+  bool _isStream = false;
+  bool _flushEachChunk = false;
+
+  // SSE-specific fields
+  Future<void> Function(SSESink sink)? _sseHandler;
+  Duration? _sseKeepAlive;
+  bool _isSse = false;
 
   /// Whether the response has been sent to the client.
   bool get isSent => _isSent;
@@ -174,6 +186,8 @@ class Response {
     }
   }
 
+  Response status(int code) => this..statusCode = code;
+
   /// Streams raw bytes to the client using the supplied content-type.
   void bytes(Uint8List bytes,
       {String contentType = 'application/octet-stream', int? statusCode}) {
@@ -211,9 +225,115 @@ class Response {
     return lookupMimeType(filePath) ?? 'application/octet-stream';
   }
 
+  /// Streams data to the client.
+  ///
+  /// Generic streaming for any byte data (files, chunked responses, etc.)
+  ///
+  /// ## Parameters
+  ///
+  /// - [data]: Stream of byte chunks to send
+  /// - [contentType]: MIME type (default: application/octet-stream)
+  /// - [statusCode]: HTTP status code
+  /// - [flushEachChunk]: Flush after each chunk for real-time streaming
+  ///
+  /// ## Example
+  ///
+  /// ```dart
+  /// app.get('/stream', (req, res) async {
+  ///   final stream = File('video.mp4').openRead();
+  ///   await res.stream(stream, contentType: 'video/mp4');
+  /// });
+  /// ```
+  Future<void> stream(
+    Stream<List<int>> data, {
+    String contentType = 'application/octet-stream',
+    int? statusCode,
+    bool flushEachChunk = false,
+  }) async {
+    if (_isSse) {
+      throw StateError('Cannot use stream() after sse() has been called');
+    }
+    if (_isStream) {
+      throw StateError('Stream response already configured.');
+    }
+    if (body != null || isBinary) {
+      throw StateError(
+          'Response body already set; choose one of body/bytes/stream/sse.');
+    }
+
+    _streamData = data;
+    _isStream = true;
+    _flushEachChunk = flushEachChunk;
+
+    headers['Content-Type'] = contentType;
+    headers['Cache-Control'] = 'no-cache';
+
+    if (statusCode != null) {
+      setStatus(statusCode);
+    }
+  }
+
+  /// Sends Server-Sent Events (SSE) to the client.
+  ///
+  /// SSE enables real-time server-to-client streaming over HTTP.
+  ///
+  /// ## Parameters
+  ///
+  /// - [handler]: Async function that receives an [SSESink] for sending events
+  /// - [keepAlive]: Optional interval for automatic keep-alive pings
+  ///
+  /// ## Example
+  ///
+  /// ```dart
+  /// app.get('/events', (req, res) async {
+  ///   res.sse((sink) async {
+  ///     sink.sendEvent('Hello!');
+  ///     sink.sendEvent('Update', event: 'notification');
+  ///
+  ///     // Stream updates
+  ///     for (var i = 0; i < 10; i++) {
+  ///       await Future.delayed(Duration(seconds: 1));
+  ///       sink.sendEvent('Event $i');
+  ///     }
+  ///
+  ///     sink.close();
+  ///   });
+  /// });
+  /// ```
+  Future<void> sse(
+    Future<void> Function(SSESink sink) handler, {
+    Duration? keepAlive,
+  }) async {
+    // Prevent both stream and SSE being set
+    if (_isStream) {
+      throw StateError('Cannot use sse() after stream() has been called');
+    }
+    if (_isSse) {
+      throw StateError('SSE already configured for this response.');
+    }
+    if (body != null || isBinary) {
+      throw StateError(
+          'Response body already set; choose one of body/bytes/stream/sse.');
+    }
+
+    // Store SSE handler and mark response as SSE
+    _sseHandler = handler;
+    _sseKeepAlive = keepAlive;
+    _isSse = true;
+
+    // Set SSE headers with proper charset
+    headers['Content-Type'] = 'text/event-stream; charset=utf-8';
+    headers['Cache-Control'] = 'no-cache';
+    headers['Connection'] = 'keep-alive';
+    headers['X-Accel-Buffering'] = 'no'; // Disable nginx buffering
+  }
+
+  /// Whether this response is configured for SSE.
+  bool get isSse => _isSse;
+
   /// Flushes the accumulated headers/cookies into the provided [HttpResponse]
   /// and closes the sink. Subsequent invocations are ignored.
-  void send(HttpResponse httpResponse) {
+  Future<void> send(HttpResponse httpResponse) async {
     if (isSent) return;
     _writeCookies(httpResponse);
     _isSent = true;
@@ -224,13 +344,70 @@ class Response {
       httpResponse.headers.set(name, value);
     });
 
+    // Disable buffering and enable chunked transfer for streaming responses
+    if (_isStream || _isSse) {
+      httpResponse.bufferOutput = false;
+      httpResponse.headers.chunkedTransferEncoding = true;
+    }
+
+    // Handle generic streaming
+    if (_isStream && _streamData != null) {
+      try {
+        if (_flushEachChunk) {
+          // Flush after each chunk for real-time streaming
+          await for (final chunk in _streamData!) {
+            httpResponse.add(chunk);
+            await httpResponse.flush();
+          }
+        } else {
+          // Use addStream for better performance
+          await httpResponse.addStream(_streamData!);
+        }
+      } finally {
+        // Always close the response
+        try {
+          await httpResponse.close();
+        } catch (_) {
+          // Ignore close errors to preserve original streaming error.
+        }
+      }
+      return;
+    }
+
+    // Handle SSE responses
+    if (_isSse && _sseHandler != null) {
+      final sink = SSESink(httpResponse);
+
+      // Start keep-alive if configured
+      if (_sseKeepAlive != null) {
+        sink.startKeepAlive(_sseKeepAlive!);
+      }
+
+      try {
+        await _sseHandler!(sink);
+      } catch (e) {
+        // Error in SSE handler, close gracefully
+        if (!sink.isClosed) {
+          await sink.close();
+        }
+        rethrow;
+      } finally {
+        // Ensure connection is closed
+        if (!sink.isClosed) {
+          await sink.close();
+        }
+      }
+      return;
+    }
+
+    // Normal response handling
     if (isBinary) {
       httpResponse.add(body as Uint8List);
     } else if (body != null) {
       httpResponse.write(body);
     }
 
-    httpResponse.close();
+    await httpResponse.close();
   }
 
   void setHeader(String name, String value) {

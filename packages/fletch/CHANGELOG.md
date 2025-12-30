@@ -5,6 +5,23 @@ All notable changes to fletch will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.3] - 2025-12-30
+
+### Added
+- **Simplified Mounting API**
+  - Added `Fletch.mount(String prefix, IsolatedContainer container)` convenience method.
+  - Allows easy mounting of isolated containers with automatic prefix handling: `app.mount('/auth', authModule)`.
+- **IsolatedContainer Extensions**
+  - Added `withPrefix(String newPrefix)` method to support easy re-mounting and configuration of containers.
+- **Flexible Response Encoding**
+  - Added an optional `Encoding encoding` parameter to `Response` helper methods (`json`, `text`, `html`, `xml`).
+  - Defaults to `utf8` but allows overriding for specific needs (e.g., legacy systems).
+
+### Fixed
+- **Unicode Response Crash**
+  - Fixed an issue where the default encoding (Latin1) caused crashes when sending Unicode characters (like emojis 🔒, ✅) in responses.
+  - All response helpers (`json`, `html`, etc.) now explicitly set `charset=utf-8` in the `Content-Type` header by default.
+
 ## [2.0.2] - 2025-01-27
 
 ### Added

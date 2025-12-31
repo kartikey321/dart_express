@@ -59,7 +59,11 @@ head -n 15 README.md
 echo "..."
 echo "---"
 echo ""
-read -p "Publish to pub.dev? (y/N): " -n 1 -r
+if [[ "$1" == "--yes" || "$1" == "-y" ]]; then
+    REPLY="y"
+else
+    read -p "Publish to pub.dev? (y/N): " -n 1 -r
+fi
 echo ""
 
 if [[ $REPLY =~ ^[Yy]$ ]]; then

@@ -5,6 +5,25 @@ All notable changes to fletch will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.0.4] - 2026-01-01
+
+### Added
+- **Unified Controller Support**
+  - Moved `useController` to `BaseContainer`, enabling controllers in both `Fletch` apps and `IsolatedContainer` modules.
+  - Added documentation example for `BaseContainer.useController`.
+
+### Changed
+- **Refactoring**
+  - `Controller.initialize` now accepts `BaseContainer` instead of `Fletch`, allowing for more flexible controller reuse.
+  - Removed duplicate `useController` implementation from `Fletch` class (now inherited).
+
+### Documentation
+- Significant overhaul of documentation site:
+  - Added new "Configuration" guide.
+  - Added "Requests & Responses" API reference.
+  - Updated "Routing" and "Error Handling" guides.
+  - Implemented SEO basics (sitemap, meta tags).
+
 ## [2.0.3] - 2025-12-30
 
 ### Added

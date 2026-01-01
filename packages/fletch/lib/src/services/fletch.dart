@@ -171,27 +171,6 @@ class Fletch extends BaseContainer {
     }
   }
 
-  /// Mounts a [Controller] at the specified [prefix] path.
-  ///
-  /// All routes registered in the controller will be prefixed with [prefix].
-  ///
-  /// ## Example
-  ///
-  /// ```dart
-  /// class UserController extends Controller {
-  ///   @override
-  ///   void registerRoutes(ControllerOptions options) {
-  ///     options.get('/list', listUsers); // -> GET /users/list
-  ///     options.post('/create', createUser); // -> POST /users/create
-  ///   }
-  /// }
-  ///
-  /// app.useController('/users', UserController());
-  /// ```
-  void useController(String prefix, Controller controller) {
-    controller.initialize(this, prefix: prefix);
-  }
-
   /// Mounts an [IsolatedContainer] at the specified [prefix] path.
   ///
   /// This is a convenience method that mounts an isolated container to the
